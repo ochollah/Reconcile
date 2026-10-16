@@ -1,1404 +1,1668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeartBridge - Production-Ready Reconciliation Platform</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .category-container { perspective: 1000px; }
-        .category-pill {
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Kingdom Love Pipeline — From Revelation to Multiplication</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#e11d48',
+              600: '#be123c',
+              700: '#9f1239',
+              900: '#4c0519',
+            },
+            gold: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            }
+          }
         }
-        .category-pill:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 30px -10px rgba(244, 63, 94, 0.15);
-        }
-        .image-motion-effect {
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-            filter: grayscale(20%);
-        }
-        .image-motion-effect:hover {
-            transform: scale(1.08) rotate(1deg);
-            filter: grayscale(0%);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
-        }
-        #map, #admin-map { 
-            height: 320px; 
-            border-radius: 1.5rem; 
-            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);
-            z-index: 1;
-        }
-        #admin-map { height: 420px; }
-        .gallery-preview-img {
-            object-fit: cover;
-            width: 100%;
-            height: 90px;
-            border-radius: 0.75rem;
-            cursor: zoom-in;
-        }
-    </style>
+      }
+    }
+  </script>
+
+  <!-- FontAwesome & Chart.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase App & Auth & Firestore SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #4c0519 0%, #881337 50%, #1e1b4b 100%);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: white !important; color: black !important; }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-rose-500 selection:text-white">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <nav class="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-100 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer group" id="nav-logo">
-                <div class="w-10 h-10 bg-gradient-to-tr from-rose-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition">
-                    <i class="fa-solid fa-heart-pulse text-white text-xl"></i>
-                </div>
-                <span class="font-black text-xl tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">HeartBridge</span>
-            </div>
-            <div class="flex items-center space-x-3">
-                <button id="nav-admin-btn" class="text-xs font-bold text-slate-700 hover:text-rose-600 bg-slate-100/80 hover:bg-rose-50 border border-slate-200 px-4 py-2.5 rounded-xl hover:border-rose-200 transition-all duration-200">
-                    <i class="fa-solid fa-user-gear mr-1.5"></i> Admin Portal
-                </button>
-                <button id="admin-logout-btn" class="hidden text-xs font-bold text-amber-700 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 px-4 py-2.5 rounded-xl transition-all duration-200">
-                    <i class="fa-solid fa-arrow-right-from-bracket mr-1.5"></i> Sign Out
-                </button>
-            </div>
+  <!-- ==================== NAVIGATION BAR ==================== -->
+  <nav class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('landing')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-gold-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-brand-500/30">
+            <i class="fa-solid fa-heart"></i>
+          </div>
+          <div>
+            <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-rose-100 to-gold-400 bg-clip-text text-transparent">KINGDOM LOVE</span>
+            <span class="text-xs block text-rose-300 font-medium tracking-widest uppercase">Pipeline & Audit</span>
+          </div>
         </div>
-    </nav>
 
-    <main class="max-w-6xl mx-auto px-4 py-12">
-
-        <section id="landing-view" class="view-section space-y-16">
-            <div class="text-center space-y-4 max-w-2xl mx-auto">
-                <span class="bg-rose-100 text-rose-700 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Restoration Engine</span>
-                <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Initiate a Path to Reconciliation</h1>
-                <p class="text-slate-500 text-base"><b>​Matthew 5:23-24</b><br>
-​"Therefore, if you are offering your gift at the altar and there remember that your brother or sister has something against you, leave your gift there in front of the altar. First go and be reconciled to them; then come and offer your gift."
-<br>​<b><u>The Ultimate Unity</u><br>
-​Ephesians 2:14–16</b><br>
-​"For he himself is our peace, who has made the two groups one and has destroyed the barrier, the dividing wall of hostility... His purpose was to create in himself one new humanity out of the two, thus making peace, and in one body to reconcile both of them to God through the cross, by which he put to death their hostility.<br><b>Select your structural relationship framework below to build a meaningful path towards understanding and collective healing.</b></p>
-            </div>
-
-            <div class="category-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
-                <div data-category="Family Re-union" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-blue-400">
-                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-people-roof text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Family Re-union</h4>
-                        <p class="text-slate-400 text-[11px] mt-0.5">Parents & Children Paths</p>
-                    </div>
-                </div>
-                
-                <div data-category="Divorcees" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-purple-400">
-                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-purple-500 to-fuchsia-500 flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-ring text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Divorcees</h4>
-                        <p class="text-slate-400 text-[11px] mt-0.5">Spousal Re-engagement</p>
-                    </div>
-                </div>
-
-                <div data-category="Broken Relationships" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-amber-400">
-                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-heart-crack text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Broken Engagement</h4>
-                        <p class="text-slate-400 text-[11px] mt-0.5">Betrothal Alignment</p>
-                    </div>
-                </div>
-
-                <div data-category="Social Relationships over 18" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-rose-400">
-                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-id-card text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Adult Social (18+)</h4>
-                        <p class="text-slate-400 text-[11px] mt-0.5">Partnership Remediation</p>
-                    </div>
-                </div>
-
-                <div data-category="Organization" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-emerald-400">
-                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-md">
-                        <i class="fa-solid fa-briefcase text-2xl"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Organization</h4>
-                        <p class="text-slate-400 text-[11px] mt-0.5">Workplace & Guild Systems</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="scripture-prep-panel" class="hidden bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6 max-w-2xl mx-auto transform transition-all duration-300">
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                    <h3 class="font-bold text-lg text-slate-900 flex items-center"><i class="fa-solid fa-scroll text-rose-500 mr-2"></i> Foundational Directives</h3>
-                    <span id="selected-category-badge" class="bg-rose-50 text-rose-700 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider border border-rose-100">Category</span>
-                </div>
-                <div id="prep-panel-loading-spinner" class="hidden text-center py-6">
-                    <i class="fa-solid fa-circle-notch animate-spin text-rose-500 text-3xl"></i>
-                    <p class="text-xs text-slate-400 mt-2 font-medium">Synchronizing context criteria arrays...</p>
-                </div>
-                <div id="prep-panel-content-area" class="space-y-4">
-                    <div class="bg-slate-50 border-l-4 border-amber-500 p-4 text-sm text-slate-700 rounded-r-xl shadow-sm">
-                        <p class="font-bold text-amber-800 text-xs uppercase tracking-wide mb-1"><i class="fa-solid fa-book-open mr-1.5"></i> Conviction & Acknowledgment Scripture:</p>
-                        <p id="prep-conviction" class="whitespace-pre-line italic font-serif text-slate-600 leading-relaxed">Loading context constraints...</p>
-                    </div>
-                    <div class="bg-slate-50 border-l-4 border-emerald-500 p-4 text-sm text-slate-700 rounded-r-xl shadow-sm">
-                        <p class="font-bold text-emerald-800 text-xs uppercase tracking-wide mb-1"><i class="fa-solid fa-quote-left mr-1.5"></i> Strategic Encouragement:</p>
-                        <p id="prep-quote" class="italic text-slate-600 leading-relaxed">Loading details...</p>
-                    </div>
-                </div>
-                <div class="pt-2 text-right">
-                    <button id="proceed-to-forms-btn" class="w-full sm:w-auto bg-slate-900 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl hover:bg-slate-800 shadow-lg transition-all duration-200">
-                        Proceed to Forms <i class="fa-solid fa-arrow-right ml-1.5"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <section id="forms-view" class="view-section hidden max-w-3xl mx-auto">
-            <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-                <div class="bg-slate-950 px-8 py-6 text-white flex justify-between items-center">
-                    <div>
-                        <h2 class="font-black text-xl tracking-tight">Reconciliation Dossier Submission</h2>
-                        <p id="form-category-sub" class="text-xs text-slate-400 font-medium mt-0.5">Category Tracking Active</p>
-                    </div>
-                    <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-rose-400">
-                        <i class="fa-solid fa-folder-plus"></i>
-                    </div>
-                </div>
-
-                <form id="reconciliation-master-form" class="p-8 space-y-8">
-                    <input type="hidden" id="edit-record-id" value="">
-                    <div class="space-y-5">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">Form 1: Identity & Apology Context</h3>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Your Full Name (National ID)</label>
-                                <input type="text" id="f1-name" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">National ID Number <span class="text-rose-500">*</span></label>
-                                <input type="text" id="f1-id" required pattern="^[0-9]{5,12}$" placeholder="Numeric format" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Your WhatsApp Phone Number</label>
-                            <input type="tel" id="f1-phone" placeholder="e.g., +2547XXXXXXXX" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label class="block text-xs font-bold text-slate-700">Pin Your Exact Location</label>
-                                <button type="button" id="detect-location-btn" class="text-[10px] bg-rose-50 text-rose-700 font-extrabold px-2.5 py-1 rounded-lg border border-rose-200 hover:bg-rose-100 transition">
-                                    <i class="fa-solid fa-location-crosshairs mr-1"></i> Auto-Detect
-                                </button>
-                            </div>
-                            <div id="map" class="border border-slate-200 mb-2"></div>
-                            <input type="text" id="f1-coords" readonly required placeholder="Coordinates verified through mapping engine" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-600 outline-none">
-                        </div>
-
-                        <div class="space-y-2">
-                            <label class="block text-xs font-bold text-slate-700">Upload Shared Memories / Gallery Files</label>
-                            <input type="file" id="f1-gallery" multiple accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 file:cursor-pointer">
-                            <div id="f1-gallery-preview" class="grid grid-cols-4 sm:grid-cols-6 gap-3 pt-2"></div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Reason for Separation</label>
-                                <textarea id="f1-reason" rows="3" required placeholder="State objectively your perspective..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition"></textarea>
-                            </div>
-                            <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed">
-                                <label class="flex items-start space-x-3 cursor-pointer">
-                                    <input type="checkbox" required class="mt-0.5 h-4 w-4 rounded text-rose-600 focus:ring-rose-500 border-slate-300">
-                                    <span class="font-medium">I verify that resolution of systemic variance is more critical than maintaining interpersonal fault metrics.</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Your Heartfelt Apology Statement</label>
-                                <textarea id="f1-apology" rows="3" required placeholder="Write your expressive statement..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Covenant Citations & Commitments</label>
-                                <textarea id="f1-citations" rows="3" placeholder="Input specific historic commitments, values, or binding baseline promises..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 pt-6 border-t border-slate-100">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Form 2: Target Recipient Registry</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Recipient's Full Name</label>
-                                <input type="text" id="f2-name" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Recipient's WhatsApp Number</label>
-                                <input type="tel" id="f2-phone" placeholder="e.g., +2547XXXXXXXX" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-4 flex justify-between items-center border-t border-slate-100">
-                        <button type="button" id="cancel-forms-btn" class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition">Cancel</button>
-                        <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl transition shadow-lg">
-                            Submit & Complete Pipeline Trace
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <section id="recipient-view" class="view-section hidden max-w-3xl mx-auto space-y-6">
-            <div id="recipient-ban-shield" class="hidden bg-white p-8 rounded-3xl border border-slate-200 text-center space-y-4 shadow-xl">
-                <i class="fa-solid fa-user-shield text-rose-500 text-5xl"></i>
-                <h3 class="text-xl font-black text-slate-900">Communication Axis Restricted</h3>
-                <p id="recipient-shield-error" class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">This axis has been closed down due to administrative block configurations associated with safety flags.</p>
-                <button onclick="window.location.reload()" class="bg-slate-900 text-white text-xs font-bold tracking-wider px-4 py-2.5 rounded-xl uppercase">Return Home</button>
-            </div>
-
-            <div id="recipient-core-panel" class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-                <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-8 py-8 flex justify-between items-center border-b border-white/10">
-                    <div>
-                        <span class="bg-rose-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">Active Invite</span>
-                        <h2 class="font-black text-2xl tracking-tight mt-1.5">Relationship Resolution Portal</h2>
-                        <p class="text-xs text-slate-400 font-medium mt-0.5">Review verified structural accounts and heartfelt baseline communications.</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md">
-                        <i class="fa-solid fa-envelope-open-text text-rose-400 text-xl"></i>
-                    </div>
-                </div>
-
-                <div class="p-8 space-y-8">
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">Step 1: Confirm Receipt Location Framework</h4>
-                        <button id="recipient-location-btn" type="button" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-location-dot text-rose-500 animate-bounce"></i>
-                            <span id="rec-loc-status">Authorize Location Validation Entry</span>
-                        </button>
-                    </div>
-
-                    <div class="space-y-4">
-                        <h4 class="font-black text-xs text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">Step 2: Review Sender Message & Dossier Logs</h4>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 p-5 rounded-2xl border border-slate-200/60 shadow-sm space-y-1">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sender Name Context</span>
-                                <p id="rec-view-sender-name" class="font-bold text-slate-800 text-sm">...</p>
-                            </div>
-                            <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 p-5 rounded-2xl border border-slate-200/60 shadow-sm space-y-1">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Relationship Category</span>
-                                <p id="rec-view-category-name" class="font-bold text-slate-800 text-sm text-indigo-600">...</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4 pt-2">
-                            <div class="bg-amber-50/40 border border-amber-200/70 p-5 rounded-2xl space-y-2 shadow-sm">
-                                <div class="flex items-center space-x-2 text-amber-800">
-                                    <i class="fa-solid fa-circle-exclamation text-sm"></i>
-                                    <span class="font-bold text-xs uppercase tracking-wider">Stated Conflict Reason</span>
-                                </div>
-                                <p id="rec-view-reason" class="text-slate-700 text-sm font-medium leading-relaxed italic">...</p>
-                            </div>
-
-                            <div class="bg-rose-50/40 border border-rose-200/70 p-6 rounded-2xl space-y-2 shadow-sm relative overflow-hidden">
-                                <div class="absolute right-4 top-4 text-rose-200/40 text-6xl pointer-events-none font-serif font-black">“</div>
-                                <div class="flex items-center space-x-2 text-rose-800">
-                                    <i class="fa-solid fa-heart text-sm"></i>
-                                    <span class="font-bold text-xs uppercase tracking-wider">Apology Statement Matrix</span>
-                                </div>
-                                <p id="rec-view-apology" class="text-slate-800 text-sm font-semibold leading-relaxed font-serif">...</p>
-                            </div>
-
-                            <div class="bg-indigo-50/40 border border-indigo-200/70 p-5 rounded-2xl space-y-2 shadow-sm">
-                                <div class="flex items-center space-x-2 text-indigo-800">
-                                    <i class="fa-solid fa-scroll text-sm"></i>
-                                    <span class="font-bold text-xs uppercase tracking-wider">Covenant Citations & Commitments</span>
-                                </div>
-                                <p id="rec-view-citations" class="text-slate-700 text-sm font-medium leading-relaxed">...</p>
-                            </div>
-                            
-                            <div class="space-y-2 pt-2">
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Shared Memories Gallery Preview</span>
-                                <div id="rec-gallery-view" class="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                                    <p class="text-slate-400 italic text-[11px] col-span-4">No gallery pictures linked to this tracking run.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 border-t border-slate-100 pt-6">
-                        <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">Step 3: Scriptural Forgiveness Architecture</h4>
-                        <div class="bg-slate-50 border-l-4 border-indigo-600 p-4 text-xs text-slate-700 rounded-r-xl shadow-sm">
-                            <p class="font-bold text-indigo-800 uppercase tracking-wide mb-1"><i class="fa-solid fa-hand-holding-heart mr-1"></i> Foundational Forgiveness Directives:</p>
-                            <p id="rec-forgive-scripture" class="whitespace-pre-line italic font-serif text-slate-600 leading-relaxed">Loading parameters...</p>
-                        </div>
-                        <div class="bg-slate-50 border-l-4 border-emerald-600 p-4 text-xs text-slate-700 rounded-r-xl shadow-sm">
-                            <p class="font-bold text-emerald-800 uppercase tracking-wide mb-1"><i class="fa-solid fa-kit-medical mr-1"></i> Divine Healing Matrix:</p>
-                            <p id="rec-healing-scripture" class="whitespace-pre-line italic font-serif text-slate-600 leading-relaxed">Loading database context...</p>
-                        </div>
-                    </div>
-
-                    <div class="pt-6 border-t border-slate-100 space-y-4 bg-gradient-to-b from-transparent to-slate-50/80 p-4 rounded-2xl">
-                        <div class="text-center max-w-md mx-auto space-y-2">
-                            <h3 class="font-black text-lg text-slate-900 tracking-tight">Make Your Decision</h3>
-                            <p class="text-xs text-slate-500 leading-relaxed">Accepting closes the separation loop. Declining provides structured closure. Choose path alignment.</p>
-                        </div>
-                        <div class="flex flex-col sm:flex-row gap-3">
-                            <button id="accept-reconciliation-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl transition shadow-lg shadow-emerald-100">
-                                <i class="fa-solid fa-square-check mr-1.5"></i> Accept Reconciliation Proposal
-                            </button>
-                            <button id="deconciliation-decline-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl transition">
-                                Decline Proposal Log
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="auth-view" class="view-section hidden max-w-md mx-auto">
-            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6">
-                <div class="text-center space-y-2">
-                    <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto text-xl shadow-sm">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h3 class="font-black text-xl text-slate-900 tracking-tight">Admin Authorization Required</h3>
-                    <p class="text-xs text-slate-400">Provide administrative credentials to view system data arrays.</p>
-                </div>
-                <form id="admin-login-form" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Operational Email Address</label>
-                        <input type="email" id="auth-email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Security Access Password</label>
-                        <input type="password" id="auth-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition">
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 text-white text-xs font-bold uppercase tracking-wider py-4 rounded-xl hover:bg-slate-800 transition shadow">
-                        Verify Credentials & Open Ledger
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <section id="admin-view" class="view-section hidden space-y-8">
-            <div class="flex justify-between items-center flex-wrap gap-4 border-b border-slate-200 pb-5">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">System Core Analytics & Verification</h2>
-                    <p class="text-xs text-emerald-600 font-mono font-bold mt-0.5"><i class="fa-solid fa-circle-check"></i> Connected to live Firebase instance</p>
-                </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
-                    <div class="flex flex-col">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filter Export Target Category</label>
-                        <select id="export-category-filter" class="bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs outline-none">
-                            <option value="Family Re-union">Family Re-union</option>
-                            <option value="Divorcees">Divorcees</option>
-                            <option value="Broken Relationships">Broken Engagement</option>
-                            <option value="Social Relationships over 18">Adult Social (18+)</option>
-                            <option value="Organization">Organization</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filter Export Timestamp Target</label>
-                        <input type="date" id="export-date-filter" class="bg-slate-50 border border-slate-200 rounded-xl p-1.5 text-xs outline-none">
-                    </div>
-                    <button id="btn-execute-csv-export" class="h-9 px-4 mt-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition shadow flex items-center gap-2">
-                        <i class="fa-solid fa-file-csv text-base"></i> Export to CSV
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl"><i class="fa-solid fa-circle-check"></i></div>
-                    <div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Successful Unions</p>
-                        <h3 id="stat-successful" class="text-2xl font-black text-slate-900">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
-                    <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600 text-xl"><i class="fa-solid fa-circle-xmark"></i></div>
-                    <div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Declined Loops</p>
-                        <h3 id="stat-unsuccessful" class="text-2xl font-black text-slate-900">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
-                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 text-xl"><i class="fa-solid fa-spinner animate-spin"></i></div>
-                    <div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pending Review</p>
-                        <h3 id="stat-pending" class="text-2xl font-black text-slate-900">0</h3>
-                    </div>
-                </div>
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col justify-center items-center">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Success Categories Distribution</p>
-                    <div class="w-full max-w-[120px] h-[120px] relative">
-                        <canvas id="successPieChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
-                <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">Spatial Analytics: Dual-Marker Tracking Grid</h4>
-                <div id="admin-map" class="border border-slate-200"></div>
-                <p class="text-[10px] text-slate-400 font-medium italic"><i class="fa-solid fa-circle-info"></i> Legend Matrix: Blue markers denote Senders. Red markers flag Target Recipients.</p>
-            </div>
-
-            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 font-bold text-xs text-slate-500 uppercase tracking-wider">
-                    Pipeline Transactional Logs & Moderation Controls
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-slate-100/50 border-b border-slate-200 text-slate-500 font-bold">
-                                <th class="p-4">Sender Info</th>
-                                <th class="p-4">Recipient Info</th>
-                                <th class="p-4">Classification</th>
-                                <th class="p-4">Status / Reason</th>
-                                <th class="p-4 text-center">Moderation & Enforcement Controls</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-table-body" class="divide-y divide-slate-100 text-slate-700 font-medium">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                        <h4 class="font-bold text-sm text-slate-900 uppercase tracking-tight flex items-center"><i class="fa-solid fa-pen-to-square text-rose-500 mr-1.5"></i> CMS Engine: Publish Prep Assets</h4>
-                        <div class="flex gap-1">
-                            <button type="button" id="btn-edit-scripture-prep" class="bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-blue-200 transition">
-                                <i class="fa-solid fa-edit"></i> Edit Core
-                            </button>
-                            <button type="button" id="btn-delete-scripture-prep" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-red-200 transition">
-                                <i class="fa-solid fa-dumpster-fire"></i> Purge Prep Fields
-                            </button>
-                        </div>
-                    </div>
-                    <form id="admin-cms-prep-form" class="space-y-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Target Classification</label>
-                            <select id="cms-prep-category" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/10">
-                                <option value="Family Re-union">Family Re-union</option>
-                                <option value="Divorcees">Divorcees</option>
-                                <option value="Broken Relationships">Broken Engagement</option>
-                                <option value="Social Relationships over 18">Adult Social (18+)</option>
-                                <option value="Organization">Organization</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Conviction Scripture Text</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="admin-prep-search" placeholder="Verse reference (e.g., Genesis 1:1)" class="flex-1 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs outline-none">
-                                <button type="button" id="btn-fetch-prep" class="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 rounded-xl">Fetch</button>
-                                <button type="button" id="btn-append-prep" class="bg-emerald-600 text-white text-[10px] px-3 rounded-xl"><i class="fa-solid fa-plus"></i></button>
-                            </div>
-                            <textarea id="cms-prep-conviction" required rows="4" placeholder="Scripture text database..." class="w-full border border-slate-200 rounded-xl mt-2 p-3 text-xs outline-none bg-slate-50 font-serif leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Encouragement Quote Reference</label>
-                            <input type="text" id="cms-prep-quote" required placeholder="Encouragement context parameter..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
-                        </div>
-                        <button type="submit" class="w-full bg-slate-900 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition">Publish/Update Prep Assets</button>
-                    </form>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                        <h4 class="font-bold text-sm text-slate-900 uppercase tracking-tight flex items-center"><i class="fa-solid fa-signature text-rose-500 mr-1.5"></i> CMS Engine: Publish Recipient Assets</h4>
-                        <div class="flex gap-1">
-                            <button type="button" id="btn-edit-scripture-rec" class="bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-blue-200 transition">
-                                <i class="fa-solid fa-edit"></i> Edit Core
-                            </button>
-                            <button type="button" id="btn-delete-scripture-rec" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-red-200 transition">
-                                <i class="fa-solid fa-dumpster-fire"></i> Purge Resolution Fields
-                            </button>
-                        </div>
-                    </div>
-                    <form id="admin-cms-rec-form" class="space-y-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Target Classification</label>
-                            <select id="cms-rec-category" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/10">
-                                <option value="Family Re-union">Family Re-union</option>
-                                <option value="Divorcees">Divorcees</option>
-                                <option value="Broken Relationships">Broken Engagement</option>
-                                <option value="Social Relationships over 18">Adult Social (18+)</option>
-                                <option value="Organization">Organization</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Core Forgiveness Directive Reference</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="admin-forgive-search" placeholder="Verse reference (e.g., Mark 11:25)" class="flex-1 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs outline-none">
-                                <button type="button" id="btn-fetch-forgive" class="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 rounded-xl">Fetch</button>
-                                <button type="button" id="btn-append-forgive" class="bg-emerald-600 text-white text-[10px] px-3 rounded-xl"><i class="fa-solid fa-plus"></i></button>
-                            </div>
-                            <textarea id="cms-rec-forgive" required rows="3" placeholder="Forgiveness directive details..." class="w-full border border-slate-200 rounded-xl mt-2 p-3 text-xs outline-none bg-slate-50 font-serif leading-relaxed"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Core Healing Reference</label>
-                            <div class="flex gap-2">
-                                <input type="text" id="admin-healing-search" placeholder="Verse reference (e.g., Proverbs 17:22)" class="flex-1 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs outline-none">
-                                <button type="button" id="btn-fetch-healing" class="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 rounded-xl">Fetch</button>
-                                <button type="button" id="btn-append-healing" class="bg-emerald-600 text-white text-[10px] px-3 rounded-xl"><i class="fa-solid fa-plus"></i></button>
-                            </div>
-                            <textarea id="cms-rec-healing" required rows="3" placeholder="Healing metrics..." class="w-full border border-slate-200 rounded-xl mt-2 p-3 text-xs outline-none bg-slate-50 font-serif leading-relaxed"></textarea>
-                        </div>
-                        <button type="submit" class="w-full bg-slate-900 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition">Publish/Update Resolution Assets</button>
-                    </form>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <div id="decline-reason-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
-        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
-            <div>
-                <h3 class="font-black text-slate-900 text-base">Select Decline Reason</h3>
-                <p class="text-[11px] text-slate-400">This feedback matrix note is transmitted directly back to the sender channel loop.</p>
-            </div>
-            <input type="hidden" id="modal-decline-record-id" value="">
-            <div class="space-y-2">
-                <button type="button" data-reason="Recipient dont want to talk" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">Recipient dont want to talk</button>
-                <button type="button" data-reason="False information" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">False information</button>
-                <button type="button" data-reason="Inadequate information" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">Inadequate information</button>
-                <button type="button" data-reason="Wrong phones number provided" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">Wrong phones number provided</button>
-            </div>
-            <div class="text-right">
-                <button type="button" id="btn-close-decline-modal" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition uppercase tracking-wider">Cancel</button>
-            </div>
+        <!-- Navigation Tabs -->
+        <div class="hidden md:flex items-center space-x-1">
+          <button id="nav-landing" onclick="switchTab('landing')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-rose-300">
+            <i class="fa-solid fa-house mr-1.5"></i> Landing & Overview
+          </button>
+          <button id="nav-input" onclick="switchTab('input')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-pen-to-square mr-1.5"></i> User Love Input
+          </button>
+          <button id="nav-study" onclick="switchTab('study')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-book-bible mr-1.5"></i> User Love Study
+          </button>
+          <button id="nav-report" onclick="switchTab('report')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-chart-line mr-1.5"></i> User Love Walk Report
+          </button>
         </div>
+
+        <!-- Auth Button -->
+        <div class="flex items-center space-x-3">
+          <div id="userInfo" class="hidden text-right mr-2">
+            <span id="userEmail" class="text-xs text-rose-200 block font-medium"></span>
+            <span class="text-[10px] text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check"></i> Connected</span>
+          </div>
+          <button id="authBtn" onclick="openAuthModal()" class="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-md shadow-brand-500/20 transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-right-to-bracket"></i> <span id="authBtnText">Sign In</span>
+          </button>
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Mobile Bottom Nav -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-900 border-t border-slate-800 flex justify-around py-2 text-xs no-print">
+    <button onclick="switchTab('landing')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-house text-base"></i><span>Home</span></button>
+    <button onclick="switchTab('input')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-pen-to-square text-base"></i><span>Input</span></button>
+    <button onclick="switchTab('study')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-book-bible text-base"></i><span>Study</span></button>
+    <button onclick="switchTab('report')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-chart-line text-base"></i><span>Report</span></button>
+  </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, addDoc, collection, onSnapshot, updateDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <!-- MAIN CONTAINER -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-16 md:mb-0">
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAGfr63u8FXuq_bTC3mEaEjNl73K0dCDXw",
-            authDomain: "meet-c6ce0.firebaseapp.com",
-            databaseURL: "https://meet-c6ce0-default-rtdb.firebaseio.com",
-            projectId: "meet-c6ce0",
-            storageBucket: "meet-c6ce0.firebasestorage.app",
-            messagingSenderId: "1041790359684",
-            appId: "1:1041790359684:web:433f70c0addb443703cad1",
-            measurementId: "G-88BB7S3VXY"
+    <!-- ==================== TAB 1: LANDING & OVERVIEW ==================== -->
+    <section id="tab-landing" class="tab-content space-y-12">
+      <!-- Hero Banner -->
+      <div class="relative rounded-3xl gradient-bg text-white p-8 sm:p-12 overflow-hidden shadow-2xl border border-rose-900/50">
+        <div class="relative z-10 max-w-3xl space-y-6">
+          <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-rose-500/20 border border-rose-400/30 text-rose-200 text-xs font-semibold tracking-wide uppercase">
+            <i class="fa-solid fa-crown text-gold-400"></i> The Constitution of Kingdom Life
+          </div>
+          <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            Love as the Governing Principle of the Kingdom
+          </h1>
+          <p class="text-rose-100 text-base sm:text-lg leading-relaxed font-light">
+            The ultimate proof that <strong class="font-bold text-white">God is Love</strong> is not found in abstract theological debate, but in the reality that His love operates as an unbroken, governing system. In God’s realm, love is not merely an emotion, an attribute, or an occasional action—love is the constitution, the supreme law, and the governing principle of Kingdom life (<em class="text-gold-300">Galatians 5:14; James 2:8</em>).
+          </p>
+
+          <!-- First and Greatest Commandment Callout -->
+          <div class="p-5 rounded-2xl bg-black/40 border-l-4 border-gold-400 space-y-2">
+            <p class="text-xs uppercase font-extrabold tracking-widest text-gold-400"><i class="fa-solid fa-star"></i> The Supreme Standard (Matthew 22:36–40)</p>
+            <blockquote class="text-sm italic text-slate-200">
+              "Master, which is the great commandment in the law? Jesus said unto him, Thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy mind. This is the first and great commandment. And the second is like unto it, Thou shalt love thy neighbour as thyself. On these two commandments hang all the law and the prophets."
+            </blockquote>
+          </div>
+
+          <div class="flex flex-wrap gap-4 pt-2">
+            <button onclick="switchTab('input')" class="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-gold-500/20 transition-all flex items-center space-x-2">
+              <span>Begin Your Love Audit</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button onclick="switchTab('study')" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-6 py-3.5 rounded-xl backdrop-blur-md transition-all flex items-center space-x-2">
+              <i class="fa-solid fa-book-open"></i> <span>Explore "WHO" & "HOW" Study</span>
+            </button>
+          </div>
+        </div>
+      </div>
+            <!-- Part 1 Exposition -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-100 text-brand-600 flex items-center justify-center text-xl font-bold">
+            1
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">"God is Love" as Absolute Reality</h3>
+          <p class="text-xs text-rose-600 font-bold tracking-wider uppercase">1 John 4:7–12, 16</p>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Scripture does not say God merely possesses love; it declares <strong>"God is love"</strong> (1 John 4:8).
+          </p>
+          <ul class="space-y-3 text-sm text-slate-600">
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>The Originator:</strong> God is the self-existent source of love. Human love is reactive and conditional, but God's love is uncaused, active, and eternal (<em>Jeremiah 31:3</em>).</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>The Trinity as Prototype:</strong> Before creation, Father, Son, and Holy Spirit existed in perfect, self-giving communion (<em>John 17:24</em>). The Kingdom is the opening up of that divine trinitarian love to creation.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
+            2
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Love as Supreme Governing Law</h3>
+          <p class="text-xs text-amber-600 font-bold tracking-wider uppercase">Matthew 22:36–40; Romans 13:8–10</p>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            When asked for the greatest commandment, Jesus summarized all revelation into two directives: supreme love for God and selfless love for neighbor.
+          </p>
+          <ul class="space-y-3 text-sm text-slate-600">
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>The Law Fulfilled:</strong> Paul reinforces in Romans 13:10: <em>"Love does no harm to a neighbor; therefore love is the fulfillment of the law."</em></span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>Constitutional Standard:</strong> In earthly kingdoms power governs. In God's Kingdom, love governs every authority, duty, and spiritual gift (<em>1 Corinthians 13:1–3</em>). Without love, all activity is noise.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Foundation: The WHO & HOW Overview Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-100 text-brand-600 flex items-center justify-center text-xl font-bold">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Part 1: THE "WHO" TO LOVE</h3>
+          <p class="text-xs text-rose-600 font-bold tracking-wider uppercase">Kingdom Targets of Love</p>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li class="p-2 rounded bg-slate-50 border border-slate-100 font-medium"><strong>1. GOD:</strong> Father, Son, and Holy Spirit above all created things (<em>Deut 6:5</em>).</li>
+            <li class="p-2 rounded bg-slate-50 border border-slate-100 font-medium"><strong>2. THE SAINTS:</strong> The household of faith & brethren (<em>John 13:34–35; 1 John 3:14</em>).</li>
+            <li class="p-2 rounded bg-slate-50 border border-slate-100 font-medium"><strong>3. OUR NEIGHBOR:</strong> Any person encountered without prejudice (<em>Luke 10:29–37</em>).</li>
+            <li class="p-2 rounded bg-slate-50 border border-slate-100 font-medium"><strong>4. OUR ENEMIES:</strong> Persecutors, critics, and opposers (<em>Matt 5:44; Rom 12:20</em>).</li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Part 2: THE "HOW" TO LOVE THE "WHO"</h3>
+          <p class="text-xs text-amber-600 font-bold tracking-wider uppercase">Spiritual & Practical Dimensions</p>
+          <ul class="space-y-2 text-sm text-slate-600">
+            <li class="p-2 rounded bg-slate-50 border border-slate-100 font-medium"><strong>A. HOW TO LOVE GOD:</strong> With all your Heart, Soul, Mind, and Strength (<em>Matt 22:37; Mark 12:30</em>).</li>
+            <li class="p-2 rounded bg-slate-50 border border-slate-100 font-medium"><strong>B. HOW TO LOVE NEIGHBOR:</strong> "As thyself" via sacrificial action, 1 Cor 13 character, forgiveness, and justice.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 6-Stage Visual Flow -->
+      <div class="bg-slate-900 text-white p-8 rounded-3xl space-y-8 shadow-xl">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <h2 class="text-2xl font-bold tracking-tight">The 6-Stage Kingdom Love Pipeline</h2>
+          <p class="text-sm text-slate-400">An unbroken spiritual architecture moving from revelation to spiritual reproduction.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2">
+            <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">Stage 1</span>
+            <h4 class="font-bold text-base text-white">REVELATION</h4>
+            <p class="text-xs text-slate-300">Discover God's true nature through Scripture, creation, and preeminently Jesus Christ. Exposes the myth of a cold ruler.</p>
+            <p class="text-[11px] text-amber-400 font-mono">1 John 4:7–10; John 14:9</p>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2">
+            <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">Stage 2</span>
+            <h4 class="font-bold text-base text-white">RECEPTION</h4>
+            <p class="text-xs text-slate-300">Respond through faith, repentance, and reconciliation. The Holy Spirit pours divine love directly into our heart.</p>
+            <p class="text-[11px] text-amber-400 font-mono">Romans 5:1–11; Ephesians 2:4–10</p>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2">
+            <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">Stage 3</span>
+            <h4 class="font-bold text-base text-white">EXPRESSION & DEMONSTRATION</h4>
+            <p class="text-xs text-slate-300">Make love visible through obedience, truth, service, justice, generous giving, and responsible stewardship.</p>
+            <p class="text-[11px] text-amber-400 font-mono">John 13:34–35; 1 John 3:16–18</p>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2">
+            <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">Stage 4</span>
+            <h4 class="font-bold text-base text-white">ABIDING</h4>
+            <p class="text-xs text-slate-300">Remain attached to the Vine—Christ, His Word, prayer, and the Spirit. Human effort alone cannot generate divine love.</p>
+            <p class="text-[11px] text-amber-400 font-mono">John 15:1–12; Galatians 5:16–25</p>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2">
+            <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">Stage 5</span>
+            <h4 class="font-bold text-base text-white">CONTINUING & STEADFASTNESS</h4>
+            <p class="text-xs text-slate-300">Love under fire. Persevere without quitting when unappreciated, handle conflict maturely, and repent when failing.</p>
+            <p class="text-[11px] text-amber-400 font-mono">Galatians 6:9; Hebrews 10:35–36</p>
+          </div>
+          <div class="p-5 rounded-xl bg-slate-800/80 border border-slate-700 space-y-2">
+            <span class="text-xs font-bold text-rose-400 tracking-widest uppercase">Stage 6</span>
+            <h4 class="font-bold text-base text-white">MULTIPLICATION</h4>
+            <p class="text-xs text-slate-300">Teach, model, equip, and disciple others so that Christ's character and Kingdom practices are reproduced across generations.</p>
+            <p class="text-[11px] text-amber-400 font-mono">Matthew 28:18–20; 2 Timothy 2:2</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: USER LOVE INPUT (AUDIT) ==================== -->
+    <section id="tab-input" class="tab-content hidden space-y-8">
+      <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sticky top-20 z-40">
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Kingdom Love-Walking Audit</h2>
+          <p class="text-xs text-slate-500 mt-1">Rate each statement from 0 to 5 honestly based on your current practical conduct.</p>
+        </div>
+        <div class="flex items-center space-x-6 w-full md:w-auto justify-between md:justify-end bg-rose-50 p-4 rounded-xl border border-rose-100">
+          <div>
+            <span class="text-[10px] text-slate-500 font-bold uppercase block">Assessed Progress</span>
+            <span id="answeredCount" class="text-xl font-extrabold text-brand-600">0/25</span>
+          </div>
+          <div class="h-8 w-px bg-rose-200"></div>
+          <div>
+            <span class="text-[10px] text-slate-500 font-bold uppercase block">Current Score</span>
+            <span id="liveScoreDisplay" class="text-xl font-extrabold text-slate-900">0 <span class="text-xs text-slate-400 font-normal">/ 125</span></span>
+          </div>
+          <button onclick="saveAuditToFirebase()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-4 py-2 rounded-lg text-sm shadow-md transition-all flex items-center space-x-1.5">
+            <i class="fa-solid fa-cloud-arrow-up"></i> <span>Save</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rating Legend Card -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-2">
+        <span class="font-bold uppercase tracking-wider block text-amber-800"><i class="fa-solid fa-circle-info"></i> Scoring Scale Instructions</span>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 pt-1 font-medium">
+          <div class="bg-white p-2 rounded border border-amber-200"><strong class="text-amber-800">0:</strong> Not evident in present conduct</div>
+          <div class="bg-white p-2 rounded border border-amber-200"><strong class="text-amber-800">1:</strong> Rarely evident</div>
+          <div class="bg-white p-2 rounded border border-amber-200"><strong class="text-amber-800">2:</strong> Occasionally evident</div>
+          <div class="bg-white p-2 rounded border border-amber-200"><strong class="text-amber-800">3:</strong> Frequently evident</div>
+          <div class="bg-white p-2 rounded border border-amber-200"><strong class="text-amber-800">4:</strong> Consistently evident</div>
+          <div class="bg-white p-2 rounded border border-amber-200"><strong class="text-amber-800">5:</strong> Consistently & deliberately under pressure</div>
+        </div>
+      </div>
+
+      <!-- AUDIT QUESTIONS CONTAINER (Populated dynamically) -->
+      <div id="auditQuestionsContainer" class="space-y-8"></div>
+
+      <!-- Submit / Save Section -->
+      <div class="flex justify-end space-x-4 pt-6">
+        <button onclick="resetAuditForm()" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-bold hover:bg-slate-100 text-sm transition-all">
+          <i class="fa-solid fa-rotate-left mr-1"></i> Reset Scale
+        </button>
+        <button onclick="saveAuditToFirebase(true)" class="px-8 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-rose-700 text-white font-extrabold text-sm shadow-xl shadow-brand-600/30 hover:opacity-95 transition-all flex items-center space-x-2">
+          <span>Complete & View Walk Report</span> <i class="fa-solid fa-chart-pie"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: USER LOVE STUDY (FULLY EXPANDED WITH "WHO" & "HOW") ==================== -->
+    <section id="tab-study" class="tab-content hidden space-y-12">
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+        <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider">
+          <i class="fa-solid fa-book-bible"></i> Kingdom Discipleship Deep Dive
+        </div>
+        <h2 class="text-3xl font-extrabold text-slate-900">User Love Study & Dynamic Action Generator</h2>
+        <p class="text-slate-600 text-sm leading-relaxed">
+          Below is the complete, comprehensive expansion of **Matthew 22:36–40** (The "WHO" to Love and "HOW" to Love) along with all **6 Stages of the Kingdom Love Pipeline**. The system continuously monitors your audit ratings and automatically generates **personalized strategic action steps** for whichever stages require growth.
+        </p>
+
+        <!-- Score Diagnostic Alert in Study -->
+        <div id="studyScoreDiagnostic" class="p-4 rounded-xl bg-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <span class="text-xs text-rose-300 font-bold uppercase tracking-widest block">Current Spiritual Diagnostic</span>
+            <span id="studyDiagnosticStatus" class="text-lg font-bold text-white">No Audit Completed Yet</span>
+            <p id="studyDiagnosticSubtitle" class="text-xs text-slate-400">Complete the audit in 'User Love Input' to receive customized score actions.</p>
+          </div>
+          <button onclick="switchTab('input')" class="px-4 py-2 rounded-lg bg-brand-600 text-white text-xs font-bold hover:bg-brand-700 whitespace-nowrap">
+            Take Audit Now
+          </button>
+        </div>
+      </div>
+
+      <!-- SPECIAL EXPOSITION MODULE: THE "WHO" AND "HOW" TO LOVE (MATTHEW 22:36–40) -->
+      <div class="bg-white rounded-2xl border border-amber-300 shadow-md p-6 sm:p-8 space-y-8">
+        <div class="border-b border-amber-200 pb-4">
+          <span class="text-xs font-extrabold uppercase tracking-widest text-amber-600 block"><i class="fa-solid fa-crown"></i> Constitutional Foundation</span>
+          <h3 class="text-2xl font-extrabold text-slate-900">The "WHO" to Love & The "HOW" to Love Them</h3>
+          <p class="text-xs text-slate-500 mt-1">Exposition based on Matthew 22:36–40 with full scriptural illustrations.</p>
+        </div>
+              <!-- Part 1 Exposition -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-rose-100 text-brand-600 flex items-center justify-center text-xl font-bold">
+            1
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">"God is Love" as Absolute Reality</h3>
+          <p class="text-xs text-rose-600 font-bold tracking-wider uppercase">1 John 4:7–12, 16</p>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Scripture does not say God merely possesses love; it declares <strong>"God is love"</strong> (1 John 4:8).
+          </p>
+          <ul class="space-y-3 text-sm text-slate-600">
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>The Originator:</strong> God is the self-existent source of love. Human love is reactive and conditional, but God's love is uncaused, active, and eternal (<em>Jeremiah 31:3</em>).</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>The Trinity as Prototype:</strong> Before creation, Father, Son, and Holy Spirit existed in perfect, self-giving communion (<em>John 17:24</em>). The Kingdom is the opening up of that divine trinitarian love to creation.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
+            2
+          </div>
+          <h3 class="text-xl font-bold text-slate-900">Love as Supreme Governing Law</h3>
+          <p class="text-xs text-amber-600 font-bold tracking-wider uppercase">Matthew 22:36–40; Romans 13:8–10</p>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            When asked for the greatest commandment, Jesus summarized all revelation into two directives: supreme love for God and selfless love for neighbor.
+          </p>
+          <ul class="space-y-3 text-sm text-slate-600">
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>The Law Fulfilled:</strong> Paul reinforces in Romans 13:10: <em>"Love does no harm to a neighbor; therefore love is the fulfillment of the law."</em></span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
+              <span><strong>Constitutional Standard:</strong> In earthly kingdoms power governs. In God's Kingdom, love governs every authority, duty, and spiritual gift (<em>1 Corinthians 13:1–3</em>). Without love, all activity is noise.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+        <!-- Part 1: THE WHO TO LOVE -->
+        <div class="space-y-4">
+          <h4 class="text-lg font-extrabold text-brand-700 uppercase tracking-wide flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center text-xs">1</span>
+            <span>Part 1: THE "WHO" TO LOVE</span>
+          </h4>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            Jesus explicitly outlines two primary targets of Kingdom love: <strong>GOD</strong> (<em>"Thou shalt love the Lord thy God..."</em>) and <strong>NEIGHBOR</strong> (<em>"...Thou shalt love thy neighbour as thyself."</em>).
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <strong class="text-slate-900 text-sm block">1. God the Father, Son, and Holy Spirit</strong>
+              <p class="text-slate-600">Loving God above all created things as the ultimate supreme affection.</p>
+              <div class="p-2 rounded bg-amber-50 text-amber-900 italic font-mono">Deuteronomy 6:5 — "And thou shalt love the LORD thy God with all thine heart..."</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <strong class="text-slate-900 text-sm block">2. The Saints / Brethren</strong>
+              <p class="text-slate-600">The household of faith, demonstrating covenant brotherhood.</p>
+              <div class="p-2 rounded bg-amber-50 text-amber-900 italic font-mono">John 13:34–35; 1 John 3:14 — "...We know that we have passed from death unto life, because we love the brethren."</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <strong class="text-slate-900 text-sm block">3. Our Neighbor</strong>
+              <p class="text-slate-600">Any person encountered in life, regardless of social, ethnic, or economic boundaries.</p>
+              <div class="p-2 rounded bg-amber-50 text-amber-900 italic font-mono">Luke 10:29–37 — The Parable of the Good Samaritan.</div>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <strong class="text-slate-900 text-sm block">4. Our Enemies / Persecutors</strong>
+              <p class="text-slate-600">Those who oppose, mistreat, criticize, or hate us.</p>
+              <div class="p-2 rounded bg-amber-50 text-amber-900 italic font-mono">Matthew 5:44; Romans 12:20 — "Love your enemies, bless them that curse you..."</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part 2: THE HOW TO LOVE THE WHO -->
+        <div class="space-y-6 border-t border-slate-100 pt-6">
+          <h4 class="text-lg font-extrabold text-brand-700 uppercase tracking-wide flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center text-xs">2</span>
+            <span>Part 2: THE "HOW" TO LOVE THE "WHO"</span>
+          </h4>
+          <p class="text-sm text-slate-700 leading-relaxed">
+            Jesus does not leave love as a vague, sentimental feeling; He specifies exact spiritual and practical dimensions for loving both God and our neighbor.
+          </p>
+
+          <!-- Section A: HOW TO LOVE GOD -->
+          <div class="space-y-4">
+            <h5 class="text-md font-bold text-slate-900 border-l-4 border-brand-600 pl-3">A. HOW TO LOVE GOD (Heart, Soul, Mind & Strength)</h5>
+
+            <div class="space-y-3 text-xs">
+              <!-- Heart -->
+              <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-100 space-y-1">
+                <strong class="text-sm text-brand-900 block">1. With All Your HEART (Wholehearted Devotion & Affection)</strong>
+                <p class="text-slate-700"><strong>The Heart as Center:</strong> The spiritual core of desires, affections, and motives (<em>Proverbs 4:23</em>).</p>
+                <div class="bg-white p-3 rounded-lg border border-rose-200 space-y-1 text-slate-800 italic">
+                  <p><strong>Obedience over Lips:</strong> "This people draweth nigh unto me with their mouth, and honoureth me with their lips; but their heart is far from me." (<em>Matthew 15:8</em>)</p>
+                  <p><strong>Undivided Loyalty:</strong> Loving God with the heart means refusing to divide primary affection with idols, money, or status (<em>1 John 2:15; Matthew 6:24</em>).</p>
+                </div>
+              </div>
+
+              <!-- Soul -->
+              <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-100 space-y-1">
+                <strong class="text-sm text-brand-900 block">2. With All Your SOUL (Surrender of Life & Will)</strong>
+                <p class="text-slate-700"><strong>The Soul as Life/Self:</strong> Loving God with the soul (<em>psyche</em>) means offering physical life, breath, and personal will completely to God.</p>
+                <div class="bg-white p-3 rounded-lg border border-rose-200 space-y-1 text-slate-800 italic">
+                  <p><strong>Jesus in Gethsemane:</strong> "Father, if thou be willing, remove this cup from me: nevertheless not my will, but thine, be done." (<em>Luke 22:42</em>)</p>
+                  <p><strong>Martyrdom & Self-Denial:</strong> "And they overcame him by the blood of the Lamb, and by the word of their testimony; and they loved not their lives unto the death." (<em>Revelation 12:11; Matthew 16:24–25</em>)</p>
+                </div>
+              </div>
+
+              <!-- Mind -->
+              <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-100 space-y-1">
+                <strong class="text-sm text-brand-900 block">3. With All Your MIND (Intellectual Alignment & Truth)</strong>
+                <p class="text-slate-700"><strong>The Mind as Understanding & Thoughts:</strong> Bringing every thought into captivity to Christ, renewing mindsets through God's Word.</p>
+                <div class="bg-white p-3 rounded-lg border border-rose-200 space-y-1 text-slate-800 italic">
+                  <p><strong>Mind Renewal:</strong> "And be not conformed to this world: but be ye transformed by the renewing of your mind..." (<em>Romans 12:2</em>)</p>
+                  <p><strong>Meditating on Truth:</strong> "Casting down imaginations... and bringing into captivity every thought to the obedience of Christ." (<em>2 Corinthians 10:5</em>)</p>
+                </div>
+              </div>
+
+              <!-- Strength -->
+              <div class="p-4 rounded-xl bg-rose-50/60 border border-rose-100 space-y-1">
+                <strong class="text-sm text-brand-900 block">4. With All Your STRENGTH (Action, Resources & Obedience)</strong>
+                <p class="text-slate-700"><strong>The Demonstration of Love:</strong> Employing physical effort, time, skills, money, and active obedience to execute His will.</p>
+                <div class="bg-white p-3 rounded-lg border border-rose-200 space-y-1 text-slate-800 italic">
+                  <p><strong>Obedience as Proof:</strong> "If ye love me, keep my commandments." (<em>John 14:15</em>)</p>
+                  <p>"For this is the love of God, that we keep his commandments: and his commandments are not grievous." (<em>1 John 5:3</em>)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section B: HOW TO LOVE YOUR NEIGHBOR -->
+          <div class="space-y-4 pt-4">
+            <h5 class="text-md font-bold text-slate-900 border-l-4 border-amber-500 pl-3">B. HOW TO LOVE YOUR NEIGHBOR ("As Thyself")</h5>
+            <p class="text-xs text-slate-600">Jesus establishes the metric for loving others: <em>"As thyself."</em> You feed yourself when hungry, protect yourself from harm, seek your own good, and desire mercy when you make mistakes.</p>
+
+            <div class="space-y-3 text-xs">
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-1">
+                <strong class="text-amber-950 font-bold block">1. Sacrificial Action Over Words (The Standard of the Cross)</strong>
+                <blockquote class="italic text-slate-800 bg-white p-2 rounded border border-amber-100">
+                  "Hereby perceive we the love of God, because he laid down his life for us: and we ought to lay down our lives for the brethren. But whoso hath this world's good, and seeth his brother have need, and shutteth up his bowels of compassion from him, how dwelleth the love of God in him? My little children, let us not love in word, neither in tongue; but in deed and in truth." (<em>1 John 3:16–18</em>)
+                </blockquote>
+              </div>
+
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-1">
+                <strong class="text-amber-950 font-bold block">2. Practical Character & Longsuffering (The Standard of 1 Corinthians 13)</strong>
+                <blockquote class="italic text-slate-800 bg-white p-2 rounded border border-amber-100">
+                  "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up, Doth not behave itself unseemly, seeketh not her own, is not easily provoked, thinketh no evil; Rejoiceth not in iniquity, but rejoiceth in the truth; Bearers all things, believeth all things, hopeth all things, endureth all things." (<em>1 Corinthians 13:4–7</em>)
+                </blockquote>
+              </div>
+
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-1">
+                <strong class="text-amber-950 font-bold block">3. Active Forgiveness and Non-Retaliation</strong>
+                <blockquote class="italic text-slate-800 bg-white p-2 rounded border border-amber-100">
+                  "And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you." (<em>Ephesians 4:32</em>)<br>
+                  "Recompense to no man evil for evil... Be not overcome of evil, but overcome evil with good." (<em>Romans 12:17, 21</em>)
+                </blockquote>
+              </div>
+
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-1">
+                <strong class="text-amber-950 font-bold block">4. Truthful Speech and Edification</strong>
+                <blockquote class="italic text-slate-800 bg-white p-2 rounded border border-amber-100">
+                  "Wherefore putting away lying, speak every man truth with his neighbour: for we are members one of another... Let no corrupt communication proceed out of your mouth, but that which is good to the use of edifying..." (<em>Ephesians 4:25, 29</em>)
+                </blockquote>
+              </div>
+
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-1">
+                <strong class="text-amber-950 font-bold block">5. Justice, Fair Treatment, and Generosity</strong>
+                <blockquote class="italic text-slate-800 bg-white p-2 rounded border border-amber-100">
+                  "He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?" (<em>Micah 6:8</em>)<br>
+                  "Charge them that are rich in this world... that they do good, that they be rich in good works, ready to distribute, willing to communicate;" (<em>1 Timothy 6:17–18</em>)
+                </blockquote>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPANDED PIPELINE STAGES 1 TO 6 -->
+      <div class="space-y-10">
+
+        <!-- Stage 1 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-slate-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-extrabold flex items-center justify-center text-sm">1</span>
+              <h3 class="text-xl font-bold tracking-tight">Stage 1: REVELATION — Unveiling God’s True Character</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400">1 John 4:7–10; John 14:9</span>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-3">
+              <h4 class="text-sm font-extrabold text-rose-600 uppercase tracking-wider">Exposition & Proof of God's Nature</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                The Kingdom Love Pipeline begins with divine revelation. Human beings cannot invent or imitate holy love (<em>agape</em>) without first discovering its eternal source. God exposes the enemy's lie that He is a cold, tyrannical ruler. Through Creation, Scripture, and preeminently the Incarnation of Jesus Christ, God reveals Himself as a loving Father whose very essence is love.
+              </p>
+              <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-950 space-y-1">
+                <strong>The Standard:</strong> The Cross of Jesus Christ is the ultimate objective proof of divine love. <em>"In this was manifested the love of God toward us, because that God sent his only begotten Son into the world, that we might live through him." (1 John 4:9)</em>
+              </div>
+            </div>
+
+            <!-- Full Scripture Text Expansion -->
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 1:</span>
+              <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
+                <p><strong>1 John 4:7–8:</strong> "Beloved, let us love one another: for love is of God; and every one that loveth is born of God, and knoweth God. He that loveth not knoweth not God; for God is love."</p>
+                <p><strong>John 14:9:</strong> "Jesus saith unto him, Have I been so long time with you, and yet hast thou not known me, Philip? he that hath seen me hath seen the Father..."</p>
+              </blockquote>
+            </div>
+
+            <!-- Dynamic Action & Study Suggestion Box for Stage 1 -->
+            <div id="dynamic-action-stage1" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
+              <div class="dynamic-content text-xs text-slate-700">
+                <em>Rate Section A in the input audit to generate dynamic actions for Revelation.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-slate-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-extrabold flex items-center justify-center text-sm">2</span>
+              <h3 class="text-xl font-bold tracking-tight">Stage 2: RECEPTION — Accepting the Reign of Love</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400">Romans 5:1–11; Ephesians 2:4–10</span>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-3">
+              <h4 class="text-sm font-extrabold text-rose-600 uppercase tracking-wider">Exposition & Heart Alignment</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Revelation requires personal reception. God never forces His reign upon humanity; He offers free reconciliation. When a sinner responds in faith and repentance, the Holy Spirit supernaturally pours divine love directly into their heart (<em>Romans 5:5</em>). Reception breaks the power of guilt, fear, and condemnation, establishing peace with God.
+              </p>
+              <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-950 space-y-1">
+                <strong>The Standard:</strong> The believer transitions from being a hostile, self-centered rebel to an adopted child of God. <em>"But God, who is rich in mercy, for his great love wherewith he loved us... hath quickened us together with Christ." (Ephesians 2:4-5)</em>
+              </div>
+            </div>
+
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 2:</span>
+              <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
+                <p><strong>Romans 5:5:</strong> "And hope maketh not ashamed; because the love of God is shed abroad in our hearts by the Holy Ghost which is given unto us."</p>
+                <p><strong>Ephesians 2:8–9:</strong> "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast."</p>
+              </blockquote>
+            </div>
+
+            <!-- Dynamic Action Box for Stage 2 -->
+            <div id="dynamic-action-stage2" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
+              <div class="dynamic-content text-xs text-slate-700">
+                <em>Rate Section B in the input audit to generate dynamic actions for Reception & Reconciliation.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-slate-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-extrabold flex items-center justify-center text-sm">3</span>
+              <h3 class="text-xl font-bold tracking-tight">Stage 3: EXPRESSION AND DEMONSTRATION — Love Made Visible</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400">John 13:34–35; 1 John 3:16–18</span>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-3">
+              <h4 class="text-sm font-extrabold text-rose-600 uppercase tracking-wider">Exposition & Practical Conduct</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Divine love cannot remain an abstract internal emotion or verbal assertion. The world encounters God when Kingdom citizens govern their words, actions, business transactions, and resources according to love. Love is demonstrated through practical righteousness, truthfulness in speech, active service, fair treatment, and sacrificial generosity.
+              </p>
+              <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-950 space-y-1">
+                <strong>The Standard:</strong> <em>"My little children, let us not love in word, neither in tongue; but in deed and in truth." (1 John 3:18)</em>
+              </div>
+            </div>
+
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 3:</span>
+              <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
+                <p><strong>John 13:34–35:</strong> "A new commandment I give unto you, That ye love one another; as I have loved you, that ye also love one another. By this shall all men know that ye are my disciples..."</p>
+                <p><strong>Micah 6:8:</strong> "He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?"</p>
+              </blockquote>
+            </div>
+
+            <!-- Dynamic Action Box for Stage 3 -->
+            <div id="dynamic-action-stage3" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
+              <div class="dynamic-content text-xs text-slate-700">
+                <em>Rate Section C & F in the input audit to generate dynamic actions for Expression & Demonstration.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-slate-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-extrabold flex items-center justify-center text-sm">4</span>
+              <h3 class="text-xl font-bold tracking-tight">Stage 4: ABIDING — Maintaining the Power Supply</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400">John 15:1–12; Galatians 5:16–25</span>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-3">
+              <h4 class="text-sm font-extrabold text-rose-600 uppercase tracking-wider">Exposition & Spiritual Disciplines</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Human willpower and fleshly desire cannot fake or sustain divine love. To love consistently under pressure, the believer must remain perpetually attached to Jesus Christ, the true Vine. Abiding is maintained through consistent immersion in God's Word, a continuous life of prayer, fellowship with the body, and yielding daily to the Holy Spirit.
+              </p>
+              <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-950 space-y-1">
+                <strong>The Standard:</strong> <em>"Abide in me, and I in you. As the branch cannot bear fruit of itself, except it abide in the vine; no more can ye, except ye abide in me." (John 15:4)</em>
+              </div>
+            </div>
+
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 4:</span>
+              <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
+                <p><strong>John 15:9–10:</strong> "As the Father hath loved me, so have I loved you: continue ye in my love. If ye keep my commandments, ye shall abide in my love..."</p>
+                <p><strong>Galatians 5:22–23:</strong> "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, Meekness, temperance..."</p>
+              </blockquote>
+            </div>
+
+            <!-- Dynamic Action Box for Stage 4 -->
+            <div id="dynamic-action-stage4" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
+              <div class="dynamic-content text-xs text-slate-700">
+                <em>Rate Section D in the input audit to generate dynamic actions for Abiding.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-slate-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-extrabold flex items-center justify-center text-sm">5</span>
+              <h3 class="text-xl font-bold tracking-tight">Stage 5: CONTINUING AND STEADFASTNESS — Love Under Fire</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400">Galatians 6:9; Hebrews 10:35–36; Romans 12:17–21</span>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-3">
+              <h4 class="text-sm font-extrabold text-rose-600 uppercase tracking-wider">Exposition & Perseverance Under Pressure</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                The ultimate test of Kingdom love is its endurance under hostility, fatigue, offense, or slow results. True love does not quit when betrayed or criticized. It handles conflict without revenge or cruelty, practices prompt repentance when failing, and responds to evil with good.
+              </p>
+              <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-950 space-y-1">
+                <strong>The Standard:</strong> <em>"And let us not be weary in well doing: for in due season we shall reap, if we faint not." (Galatians 6:9)</em>
+              </div>
+            </div>
+
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 5:</span>
+              <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
+                <p><strong>Romans 12:18, 21:</strong> "If it be possible, as much as lieth in you, live peaceably with all men... Be not overcome of evil, but overcome evil with good."</p>
+                <p><strong>Matthew 5:44:</strong> "But I say unto you, Love your enemies, bless them that curse you, do good to them that hate you, and pray for them which despitefully use you..."</p>
+              </blockquote>
+            </div>
+
+            <!-- Dynamic Action Box for Stage 5 -->
+            <div id="dynamic-action-stage5" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
+              <div class="dynamic-content text-xs text-slate-700">
+                <em>Rate Section E in the input audit to generate dynamic actions for Continuing & Steadfastness.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage 6 -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="bg-slate-900 text-white p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-full bg-rose-500 text-white font-extrabold flex items-center justify-center text-sm">6</span>
+              <h3 class="text-xl font-bold tracking-tight">Stage 6: MULTIPLICATION — Reproducing Kingdom Culture</h3>
+            </div>
+            <span class="text-xs font-mono text-amber-400">Matthew 28:18–20; 2 Timothy 2:2</span>
+          </div>
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="space-y-3">
+              <h4 class="text-sm font-extrabold text-rose-600 uppercase tracking-wider">Exposition & Generational Legacy</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Kingdom love is inherently expansive and generational. The pipeline reaches its fullness when mature disciples intentionally teach, model, equip, and mentor others so that Christ’s nature and practices are multiplied into future generations.
+              </p>
+              <div class="p-4 rounded-xl bg-rose-50 border border-rose-100 text-xs text-rose-950 space-y-1">
+                <strong>The Standard:</strong> <em>"And the things that thou hast heard of me among many witnesses, the same commit thou to faithful men, who shall be able to teach others also." (2 Timothy 2:2)</em>
+              </div>
+            </div>
+
+            <div class="space-y-2 border-t border-slate-100 pt-4">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 6:</span>
+              <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
+                <p><strong>Matthew 28:19–20:</strong> "Go ye therefore, and teach all nations... Teaching them to observe all things whatsoever I have commanded you..."</p>
+              </blockquote>
+            </div>
+
+            <!-- Dynamic Action Box for Stage 6 -->
+            <div id="dynamic-action-stage6" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
+              <div class="dynamic-content text-xs text-slate-700">
+                <em>Rate Section G in the input audit to generate dynamic actions for Multiplication.</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: USER LOVE WALK REPORT ==================== -->
+    <section id="tab-report" class="tab-content hidden space-y-8">
+      <!-- Report Header -->
+      <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase mb-2">
+            <i class="fa-solid fa-file-contract"></i> Spiritual Walk Diagnostic
+          </div>
+          <h2 class="text-3xl font-extrabold text-slate-900">User Love Walk Report</h2>
+          <p class="text-xs text-slate-500 mt-1">Official summary profile card of your Kingdom Love-Walking Audit.</p>
+        </div>
+        <div class="flex items-center space-x-3 no-print">
+          <button onclick="window.print()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-print"></i> <span>Print / Export PDF</span>
+          </button>
+          <button onclick="saveAuditToFirebase()" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center space-x-2">
+            <i class="fa-solid fa-cloud"></i> <span>Save & Sync</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Score Banner -->
+      <div id="reportStatusBanner" class="rounded-2xl p-8 text-white gradient-bg shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center md:text-left">
+          <span class="text-xs font-bold tracking-widest text-rose-300 uppercase">Overall Diagnostic Status</span>
+          <h3 id="reportPipelineTitle" class="text-3xl font-extrabold text-gold-400">NO AUDIT COMPLETED</h3>
+          <p id="reportPipelineDesc" class="text-sm text-rose-100 max-w-xl">Please complete the 25-statement assessment in 'User Love Input' to render your spiritual walk status.</p>
+        </div>
+        <div class="text-center bg-black/30 p-6 rounded-2xl border border-white/10 min-w-[180px]">
+          <span class="text-[11px] font-bold text-rose-200 uppercase block">Total Points</span>
+          <span id="reportTotalScore" class="text-4xl font-extrabold text-white">0</span>
+          <span class="text-xs text-rose-300 block">out of 125 max</span>
+        </div>
+      </div>
+
+      <!-- Visual Breakdown: Radar Chart & Section Scores -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="text-base font-bold text-slate-900 border-b pb-3"><i class="fa-solid fa-chart-radar text-brand-600 mr-2"></i> Section Balance Radar</h3>
+          <div class="relative h-64 sm:h-80 w-full flex items-center justify-center">
+            <canvas id="scoreRadarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          <h3 class="text-base font-bold text-slate-900 border-b pb-3"><i class="fa-solid fa-list-check text-brand-600 mr-2"></i> Section Score Diagnostic</h3>
+          <div id="sectionScoreList" class="space-y-3 text-xs">
+            <p class="text-slate-400 italic">Complete audit to view section breakdown.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Official Scoring Interpretation Matrix -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <h3 class="text-base font-bold text-slate-900 border-b pb-3"><i class="fa-solid fa-table-list text-brand-600 mr-2"></i> Official Pipeline Score Range Matrix</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider font-extrabold border-b">
+                <th class="p-3">Score Range</th>
+                <th class="p-3">Pipeline Status</th>
+                <th class="p-3">Diagnostic Meaning & Primary Focus</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr id="matrix-range-1" class="hover:bg-slate-50">
+                <td class="p-3 font-bold font-mono">0 – 40</td>
+                <td class="p-3 font-bold text-rose-600">BLOCKED PIPELINE</td>
+                <td class="p-3">Love is mostly theoretical. Focus on Stage 1 & 2 (Revelation & Reception). Meditate deeply on God's grace and forgiveness.</td>
+              </tr>
+              <tr id="matrix-range-2" class="hover:bg-slate-50">
+                <td class="p-3 font-bold font-mono">41 – 75</td>
+                <td class="p-3 font-bold text-amber-600">LEAKING PIPELINE</td>
+                <td class="p-3">Inconsistent walk. Focus on Stage 4 (Abiding). Establish consistent daily spiritual disciplines and Word communion.</td>
+              </tr>
+              <tr id="matrix-range-3" class="hover:bg-slate-50">
+                <td class="p-3 font-bold font-mono">76 – 105</td>
+                <td class="p-3 font-bold text-blue-600">DEVELOPING PIPELINE</td>
+                <td class="p-3">Good foundation. Focus on Stage 5 & 6 (Steadfastness & Stewardship). Refine conflict handling, integrity, and patience.</td>
+              </tr>
+              <tr id="matrix-range-4" class="hover:bg-slate-50">
+                <td class="p-3 font-bold font-mono">106 – 125</td>
+                <td class="p-3 font-bold text-emerald-600">FLOWING PIPELINE</td>
+                <td class="p-3">Kingdom love is actively governing conduct. Focus on Stage 6 (Multiplication). Mentor, model, equip, and disciple others.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- History Logs -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 no-print">
+        <div class="flex items-center justify-between border-b pb-3">
+          <h3 class="text-base font-bold text-slate-900"><i class="fa-solid fa-clock-rotate-left text-brand-600 mr-2"></i> Audit History Logs</h3>
+          <button onclick="clearHistoryLogs()" class="text-xs text-rose-600 hover:underline"><i class="fa-solid fa-trash"></i> Clear History</button>
+        </div>
+        <div id="historyLogsContainer" class="space-y-2 text-xs">
+          <p class="text-slate-400 italic">No previous saved audits found on this device.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== AUTHENTICATION MODAL ==================== -->
+  <div id="authModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 space-y-6 shadow-2xl relative border border-slate-100">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+
+      <div class="text-center space-y-2">
+        <div class="w-12 h-12 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center text-xl font-bold mx-auto">
+          <i class="fa-solid fa-user-lock"></i>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900">Firebase Email Login</h3>
+        <p class="text-xs text-slate-500">Sign in or register to sync your Kingdom Love Walk report across devices.</p>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Email Address</label>
+          <input type="email" id="authEmail" required placeholder="believer@kingdom.org" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Password</label>
+          <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none">
+        </div>
+
+        <div id="authError" class="text-xs text-rose-600 hidden font-semibold"></div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button type="submit" id="signInBtn" class="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md transition-all">Sign In</button>
+          <button type="button" onclick="handleSignUp()" class="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-8 text-center text-xs border-t border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p class="font-bold text-slate-300">The Kingdom Love Pipeline — From Revelation to Multiplication</p>
+      <p>Continuous spiritual diagnostic tool based on 1 John 4, Matthew 22:36–40, and the New Covenant scriptures.</p>
+    </div>
+  </footer>
+
+  <!-- ==================== APPLICATION SCRIPT ==================== -->
+  <script>
+    // Global Safe Firebase & App Initialization Variables
+    window.appId = 'kingdom-love-pipeline-app';
+    let currentUser = null;
+    let db = null;
+    let auth = null;
+    let radarChartInstance = null;
+
+    // DATA STRUCTURE: 25 Statements across Sections A-G
+    const AUDIT_SECTIONS = [
+      {
+        id: 'A',
+        title: 'Section A: Revelation & Understanding (The Governing Source)',
+        stageRef: 'Stage 1: REVELATION',
+        maxScore: 20,
+        questions: [
+          {
+            id: 1,
+            text: "I clearly understand that God is the eternal source and nature of love.",
+            scriptureRef: "1 John 4:7–8",
+            scriptureText: "Beloved, let us love one another: for love is of God; and every one that loveth is born of God, and knoweth God. He that loveth not knoweth not God; for God is love."
+          },
+          {
+            id: 2,
+            text: "I recognize Jesus Christ and His sacrifice on the Cross as the ultimate revelation of God's love.",
+            scriptureRef: "John 14:9; Romans 5:8",
+            scriptureText: "Jesus saith unto him, Have I been so long time with you, and yet hast thou not known me, Philip? he that hath seen me hath seen the Father... But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us."
+          },
+          {
+            id: 3,
+            text: "I actively distinguish holy, sacrificial biblical love (Agape) from human manipulation, lust, and selfishness.",
+            scriptureRef: "1 Corinthians 13:4–6",
+            scriptureText: "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up, Doth not behave itself unseemly, seeketh not her own, is not easily provoked, thinketh no evil; Rejoiceth not in iniquity, but rejoiceth in the truth;"
+          },
+          {
+            id: 4,
+            text: "I view God's commandments not as burdensome rules, but as the loving guidance of a wise Father.",
+            scriptureRef: "1 John 5:3",
+            scriptureText: "For this is the love of God, that we keep his commandments: and his commandments are not grievous."
+          }
+        ]
+      },
+      {
+        id: 'B',
+        title: 'Section B: Reception & Reconciliation (Heart Alignment)',
+        stageRef: 'Stage 2: RECEPTION',
+        maxScore: 15,
+        questions: [
+          {
+            id: 5,
+            text: "I have personally received God's forgiving love through faith, knowing I am accepted in Christ.",
+            scriptureRef: "Ephesians 1:6–7; Romans 5:1",
+            scriptureText: "To the praise of the glory of his grace, wherein he hath made us accepted in the beloved. In whom we have redemption through his blood, the forgiveness of sins... Therefore being justified by faith, we have peace with God through our Lord Jesus Christ."
+          },
+          {
+            id: 6,
+            text: "I extend forgiveness freely to others because I have experienced God’s forgiveness.",
+            scriptureRef: "Ephesians 4:32",
+            scriptureText: "And be ye kind one to another, tenderhearted, forgiving one another, even as God for Christ's sake hath forgiven you."
+          },
+          {
+            id: 7,
+            text: "I let the peace and love of God rule my internal emotional state rather than fear or condemnation.",
+            scriptureRef: "1 John 4:18; Colossians 3:15",
+            scriptureText: "There is no fear in love; but perfect love casteth out fear... And let the peace of God rule in your hearts, to the which also ye are called in one body; and be ye thankful."
+          }
+        ]
+      },
+      {
+        id: 'C',
+        title: 'Section C: Expression & Practical Demonstration (Love in Action)',
+        stageRef: 'Stage 3: EXPRESSION & DEMONSTRATION',
+        maxScore: 20,
+        questions: [
+          {
+            id: 8,
+            text: "My speech is truthful, encouraging, and free from slander, gossip, or tearing down others.",
+            scriptureRef: "Ephesians 4:25, 29",
+            scriptureText: "Wherefore putting away lying, speak every man truth with his neighbour... Let no corrupt communication proceed out of your mouth, but that which is good to the use of edifying..."
+          },
+          {
+            id: 9,
+            text: "I demonstrate love through practical, tangible actions rather than mere verbal promises.",
+            scriptureRef: "1 John 3:18",
+            scriptureText: "My little children, let us not love in word, neither in tongue; but in deed and in truth."
+          },
+          {
+            id: 10,
+            text: "I treat all people fairly, honorably, and without partiality or prejudice.",
+            scriptureRef: "Micah 6:8; James 2:1, 8–9",
+            scriptureText: "He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God? My brethren, have not the faith of our Lord Jesus Christ... with respect of persons."
+          },
+          {
+            id: 11,
+            text: "I actively look for opportunities to serve others without seeking recognition or personal gain.",
+            scriptureRef: "Philippians 2:3–4",
+            scriptureText: "Let nothing be done through strife or vainglory; but in lowliness of mind let each esteem other better than themselves. Look not every man on his own things, but every man also on the things of others."
+          }
+        ]
+      },
+      {
+        id: 'D',
+        title: 'Section D: Abiding in Christ (The Power Supply)',
+        stageRef: 'Stage 4: ABIDING',
+        maxScore: 15,
+        questions: [
+          {
+            id: 12,
+            text: "I regularly feed upon and align my decisions with God’s Word.",
+            scriptureRef: "John 8:31; Psalm 119:105",
+            scriptureText: "Then said Jesus to those Jews which believed on him, If ye continue in my word, then are ye my disciples indeed... Thy word is a lamp unto my feet, and a light unto my path."
+          },
+          {
+            id: 13,
+            text: "I maintain a consistent, honest prayer life and communion with God.",
+            scriptureRef: "Philippians 4:6–7; 1 Thessalonians 5:17",
+            scriptureText: "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God... Pray without ceasing."
+          },
+          {
+            id: 14,
+            text: "I yield my desires daily to the Holy Spirit and walk in His fruit.",
+            scriptureRef: "Galatians 5:16, 22–23",
+            scriptureText: "This I say then, Walk in the Spirit, and ye shall not fulfil the lust of the flesh... But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, Meekness, temperance..."
+          }
+        ]
+      },
+      {
+        id: 'E',
+        title: 'Section E: Continuing, Steadfastness & Conflict Resolution (Love Under Pressure)',
+        stageRef: 'Stage 5: CONTINUING & STEADFASTNESS',
+        maxScore: 20,
+        questions: [
+          {
+            id: 15,
+            text: "I persist in doing good and serving others even when progress is slow or unappreciated.",
+            scriptureRef: "Galatians 6:9",
+            scriptureText: "And let us not be weary in well doing: for in due season we shall reap, if we faint not."
+          },
+          {
+            id: 16,
+            text: "I handle interpersonal conflicts maturely, seeking peace without resorting to revenge, cruelty, or passive aggression.",
+            scriptureRef: "Romans 12:17–18",
+            scriptureText: "Recompense to no man evil for evil. Provide things honest in the sight of all men. If it be possible, as much as lieth in you, live peaceably with all men."
+          },
+          {
+            id: 17,
+            text: "I pray for and show kindness toward those who oppose, criticize, or mistreat me.",
+            scriptureRef: "Matthew 5:44",
+            scriptureText: "But I say unto you, Love your enemies, bless them that curse you, do good to them that hate you, and pray for them which despitefully use you, and persecute you;"
+          },
+          {
+            id: 18,
+            text: "When I fail or slip into sin, I repent promptly and return to faithful conduct.",
+            scriptureRef: "Revelation 2:5; Proverbs 28:13",
+            scriptureText: "Remember therefore from whence thou art fallen, and repent, and do the first works... He that covereth his sins shall not prosper: but whoso confesseth and forsaketh them shall have mercy."
+          }
+        ]
+      },
+      {
+        id: 'F',
+        title: 'Section F: Stewardship & Responsibility (Love in Governance)',
+        stageRef: 'Stage 3 & 5 Governance',
+        maxScore: 15,
+        questions: [
+          {
+            id: 19,
+            text: "I manage money, possessions, and resources with strict honesty and integrity.",
+            scriptureRef: "Luke 16:10",
+            scriptureText: "He that is faithful in that which is least is faithful also in much: and he that is unjust in the least is unjust also in much."
+          },
+          {
+            id: 20,
+            text: "I fulfill my work, school, or ministry responsibilities with diligence as unto the Lord.",
+            scriptureRef: "Colossians 3:23; Ephesians 4:28",
+            scriptureText: "And whatsoever ye do, do it heartily, as to the Lord, and not unto men... Let him that stole steal no more: but rather let him labour, working with his hands the thing which is good..."
+          },
+          {
+            id: 21,
+            text: "I use my material blessings generously to support the needy and advance the Kingdom.",
+            scriptureRef: "1 Timothy 6:18; 2 Corinthians 9:7",
+            scriptureText: "That they do good, that they be rich in good works, ready to distribute, willing to communicate... Every man according as he purposeth in his heart, so let him give; not grudgingly, or of necessity: for God loveth a cheerful giver."
+          }
+        ]
+      },
+      {
+        id: 'G',
+        title: 'Section G: Correction, Growth & Multiplication (Expanding the Governance)',
+        stageRef: 'Stage 6: MULTIPLICATION',
+        maxScore: 20,
+        questions: [
+          {
+            id: 22,
+            text: "I humbly acknowledge my mistakes and take responsibility when I am wrong.",
+            scriptureRef: "1 John 1:9",
+            scriptureText: "If we confess our sins, he is faithful and just to forgive us our sins, and to cleanse us from all unrighteousness."
+          },
+          {
+            id: 23,
+            text: "I actively seek forgiveness and make practical amends when my actions harm others.",
+            scriptureRef: "Matthew 5:23–24",
+            scriptureText: "Therefore if thou bring thy gift to the altar, and there rememberest that thy brother hath aught against thee; Leave there thy gift before the altar, and go thy way; first be reconciled to thy brother, and then come and offer thy gift."
+          },
+          {
+            id: 24,
+            text: "I welcome scriptural correction and accountability from godly leaders and peers.",
+            scriptureRef: "Proverbs 27:6; James 1:22–25",
+            scriptureText: "Faithful are the wounds of a friend; but the kisses of an enemy are deceitful... But be ye doers of the word, and not hearers only, deceiving your own selves."
+          },
+          {
+            id: 25,
+            text: "I intentionally mentor, model, and equip others to walk in Christlike love and spiritual maturity.",
+            scriptureRef: "Matthew 28:18–20; 2 Timothy 2:2",
+            scriptureText: "Go ye therefore, and teach all nations... And the things that thou hast heard of me among many witnesses, the same commit thou to faithful men, who shall be able to teach others also."
+          }
+        ]
+      }
+    ];
+
+    // User Ratings Storage
+    let userRatings = {};
+
+    // INITIALIZATION ON DOM LOAD
+    document.addEventListener('DOMContentLoaded', () => {
+      initFirebase();
+      renderAuditForm();
+      loadLocalHistory();
+      updateCalculations();
+    });
+
+    // 1. FIREBASE INITIALIZATION
+    function initFirebase() {
+      const firebaseConfig = {
+  apiKey: "AIzaSyAZTsgbSAoxB3ocInU_lGfATxIFcG4qlzI",
+  authDomain: "love-42e25.firebaseapp.com",
+  projectId: "love-42e25",
+  storageBucket: "love-42e25.firebasestorage.app",
+  messagingSenderId: "106832090230",
+  appId: "1:106832090230:web:c5038d2e07afa8dc3d3b57",
+  measurementId: "G-DXEX8M91PJ"
+};
+
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
+        auth = firebase.auth();
+        db = firebase.firestore();
+
+        auth.onAuthStateChanged(user => {
+          currentUser = user;
+          const userInfo = document.getElementById('userInfo');
+          const userEmail = document.getElementById('userEmail');
+          const authBtnText = document.getElementById('authBtnText');
+
+          if (user) {
+            userEmail.textContent = user.email;
+            userInfo.classList.remove('hidden');
+            authBtnText.textContent = 'Sign Out';
+            loadUserAuditFromFirestore();
+          } else {
+            userInfo.classList.add('hidden');
+            authBtnText.textContent = 'Sign In';
+          }
+        });
+      } catch (err) {
+        console.warn("Firebase running in offline/local mode:", err);
+      }
+    }
+
+    // AUTH MODAL HANDLERS
+    function openAuthModal() {
+      if (currentUser) {
+        auth.signOut();
+        alert("You have signed out.");
+        return;
+      }
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      const errDiv = document.getElementById('authError');
+      errDiv.classList.add('hidden');
+
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        closeAuthModal();
+      } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove('hidden');
+      }
+    }
+
+    async function handleSignUp() {
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      const errDiv = document.getElementById('authError');
+      errDiv.classList.add('hidden');
+
+      if (!email || !pass) {
+        errDiv.textContent = "Please enter both email and password.";
+        errDiv.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        await auth.createUserWithEmailAndPassword(email, pass);
+        closeAuthModal();
+      } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove('hidden');
+      }
+    }
+
+    // 2. RENDER AUDIT FORM
+    function renderAuditForm() {
+      const container = document.getElementById('auditQuestionsContainer');
+      container.innerHTML = '';
+
+      AUDIT_SECTIONS.forEach(sec => {
+        const secCard = document.createElement('div');
+        secCard.className = "bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden space-y-6 p-6 sm:p-8";
+
+        secCard.innerHTML = `
+          <div class="border-b border-slate-100 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span class="text-[10px] font-extrabold tracking-widest text-brand-600 uppercase block">${sec.stageRef}</span>
+              <h3 class="text-lg font-bold text-slate-900">${sec.title}</h3>
+            </div>
+            <div class="text-xs text-slate-500 font-mono">
+              Section Score: <span id="sec-score-${sec.id}" class="font-bold text-slate-900">0</span> / ${sec.maxScore}
+            </div>
+          </div>
+          <div class="space-y-6" id="sec-questions-${sec.id}"></div>
+        `;
+
+        container.appendChild(secCard);
+
+        const qContainer = secCard.querySelector(`#sec-questions-${sec.id}`);
+
+        sec.questions.forEach(q => {
+          const qBox = document.createElement('div');
+          qBox.className = "p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-3";
+
+          qBox.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+              <div class="space-y-1">
+                <span class="text-xs font-bold text-slate-400">Statement #${q.id}</span>
+                <p class="text-sm font-semibold text-slate-800">${q.text}</p>
+                <button type="button" onclick="toggleScripture(${q.id})" class="text-xs text-brand-600 font-bold hover:underline flex items-center space-x-1 mt-1">
+                  <i class="fa-solid fa-book-open"></i> <span>Scripture: ${q.scriptureRef}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Full Scripture Text Drawer -->
+            <div id="scripture-drawer-${q.id}" class="hidden p-3 rounded-lg bg-amber-50/80 border border-amber-200 text-xs italic text-amber-950 space-y-1">
+              <strong>${q.scriptureRef}:</strong> "${q.scriptureText}"
+            </div>
+
+            <!-- Rating Buttons 0 to 5 -->
+            <div class="pt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span class="text-[11px] font-bold text-slate-400 mr-2 uppercase">Rate:</span>
+              ${[0, 1, 2, 3, 4, 5].map(score => `
+                <button type="button" onclick="setRating(${q.id},${score})" id="btn-q${q.id}-${score}" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg text-xs font-bold transition-all border border-slate-300 bg-white text-slate-700 hover:bg-slate-100">
+                  ${score}
+                </button>
+              `).join('')}
+            </div>
+          `;
+
+          qContainer.appendChild(qBox);
+        });
+      });
+    }
+
+    function toggleScripture(qId) {
+      const drawer = document.getElementById(`scripture-drawer-${qId}`);
+      drawer.classList.toggle('hidden');
+    }
+
+    function setRating(qId, score) {
+      userRatings[qId] = score;
+
+      for (let i = 0; i <= 5; i++) {
+        const btn = document.getElementById(`btn-q${qId}-${i}`);
+        if (btn) {
+          if (i === score) {
+            btn.className = "w-8 h-8 sm:w-9 sm:h-9 rounded-lg text-xs font-extrabold transition-all bg-brand-600 text-white shadow-md scale-105 border-transparent";
+          } else {
+            btn.className = "w-8 h-8 sm:w-9 sm:h-9 rounded-lg text-xs font-bold transition-all border border-slate-300 bg-white text-slate-700 hover:bg-slate-100";
+          }
+        }
+      }
+
+      updateCalculations();
+    }
+
+    // 3. REAL-TIME SCORE COMPUTATION & DYNAMIC ACTION GENERATION
+    function updateCalculations() {
+      let total = 0;
+      let answered = 0;
+
+      let secScores = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0 };
+
+      AUDIT_SECTIONS.forEach(sec => {
+        let secSum = 0;
+        sec.questions.forEach(q => {
+          if (userRatings[q.id] !== undefined) {
+            secSum += userRatings[q.id];
+            answered++;
+          }
+        });
+        secScores[sec.id] = secSum;
+        const secDisplay = document.getElementById(`sec-score-${sec.id}`);
+        if (secDisplay) secDisplay.textContent = secSum;
+      });
+
+      total = Object.values(secScores).reduce((a, b) => a + b, 0);
+
+      document.getElementById('answeredCount').textContent = `${answered}/25`;
+      document.getElementById('liveScoreDisplay').innerHTML = `${total} <span class="text-xs text-slate-400 font-normal">/ 125</span>`;
+
+      renderReportViews(total, secScores, answered);
+      updateStudyDynamicActions(secScores, total);
+    }
+
+    function updateStudyDynamicActions(secScores, total) {
+      const diagStatus = document.getElementById('studyDiagnosticStatus');
+      const diagSub = document.getElementById('studyDiagnosticSubtitle');
+
+      if (Object.keys(userRatings).length === 0) {
+        diagStatus.textContent = "No Audit Completed Yet";
+        diagSub.textContent = "Complete statements in 'User Love Input' to activate personalized dynamic study suggestions.";
+      } else {
+        const pipelineStatus = getPipelineStatus(total);
+        diagStatus.textContent = `${pipelineStatus.title} (${total}/125 Points)`;
+        diagSub.textContent = `Focus Strategy: ${pipelineStatus.focus}`;
+      }
+
+      // STAGE 1 (Section A)
+      updateStageActionBox('dynamic-action-stage1', secScores.A, 20, "Revelation & Understanding", [
+        "Spend 30 days meditating on 1 John 4 and Romans 8 to root out legalism and experience God's paternal affection.",
+        "Study the life of Jesus in John 14 to see how divine love operates without intimidation.",
+        "Memorize 1 John 4:9–10 and write a daily reflection on Christ's voluntary sacrifice."
+      ]);
+
+      // STAGE 2 (Section B)
+      updateStageActionBox('dynamic-action-stage2', secScores.B, 15, "Reception & Reconciliation", [
+        "Practice daily forgiveness: list persons who offended you and extend unconditional grace in prayer (Ephesians 4:32).",
+        "Renounce fear and condemnation daily by confessing Romans 8:1 and 1 John 4:18.",
+        "Receive God's peace by sitting quietly in prayer for 10 minutes before starting daily tasks."
+      ]);
+
+      // STAGE 3 (Section C & F)
+      const stage3Score = secScores.C + secScores.F;
+      updateStageActionBox('dynamic-action-stage3', stage3Score, 35, "Expression & Stewardship", [
+        "Pick one anonymous practical act of kindness weekly (e.g., meeting a financial or physical need without taking credit).",
+        "Cleanse your speech: refrain from gossip, negative criticism, or exaggeration for 21 days (Ephesians 4:29).",
+        "Conduct a financial stewardship audit: ensure complete honesty in business, taxes, and cheerful giving (1 Timothy 6:18)."
+      ]);
+
+      // STAGE 4 (Section D)
+      updateStageActionBox('dynamic-action-stage4', secScores.D, 15, "Abiding in Christ", [
+        "Establish an unshakeable 15-to-30 minute morning rhythm of Scripture reading and fellowship prior to digital devices.",
+        "Journal your daily prayer life and listen for the promptings of the Holy Spirit.",
+        "Walk in Galatians 5:22 fruit by pausing to pray before responding in stressful situations."
+      ]);
+
+      // STAGE 5 (Section E)
+      updateStageActionBox('dynamic-action-stage5', secScores.E, 20, "Continuing & Steadfastness", [
+        "Apply the 'Quick Repentance Rule': when convicted of fault or conflict, seek peace and apologize within 24 hours.",
+        "Pray specifically for critics or hostile individuals in your life (Matthew 5:44).",
+        "Persevere in slow-moving spiritual initiatives without growing weary or abandoning love."
+      ]);
+
+      // STAGE 6 (Section G)
+      updateStageActionBox('dynamic-action-stage6', secScores.G, 20, "Correction & Multiplication", [
+        "Identify at least one younger believer or peer to intentionally mentor and disciple in Christlike walk.",
+        "Welcome scriptural correction from trusted spiritual accountability partners without defensive behavior.",
+        "Equip others by teaching them how to walk through the Kingdom Love Pipeline."
+      ]);
+    }
+
+    function updateStageActionBox(boxId, currentScore, maxScore, stageName, weakActionSuggestions) {
+      const box = document.getElementById(boxId);
+      if (!box) return;
+
+      const pct = maxScore > 0 ? (currentScore / maxScore) * 100 : 0;
+      let statusBadge = "";
+      let contentHtml = "";
+
+      if (Object.keys(userRatings).length === 0) {
+        contentHtml = `<p class="text-slate-500 italic">Rate audit parameters in 'User Love Input' to activate dynamic suggestions.</p>`;
+      } else if (pct < 65) {
+        statusBadge = `<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-800 font-extrabold text-[10px] uppercase">Weak Area (${currentScore}/${maxScore})</span>`;
+        contentHtml = `
+          <div class="space-y-2 mt-2">
+            <p class="text-xs font-bold text-rose-900">Recommended Action Plan for ${stageName}:</p>
+            <ul class="list-disc pl-4 space-y-1 text-xs text-rose-950">
+              ${weakActionSuggestions.map(act => `<li>${act}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      } else {
+        statusBadge = `<span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-extrabold text-[10px] uppercase">Strong Walk (${currentScore}/${maxScore})</span>`;
+        contentHtml = `
+          <p class="text-xs text-emerald-900 mt-2"><strong>Healthy Flow:</strong> You are demonstrating consistent Kingdom strength in ${stageName}. Continue abiding in Christ and model this practice to others.</p>
+        `;
+      }
+
+      box.querySelector('.dynamic-content').innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-800">Diagnostic Result</span>
+          ${statusBadge}
+        </div>
+        ${contentHtml}
+      `;
+    }
+
+    // 4. RENDER REPORT VIEWS & RADAR CHART
+    function renderReportViews(totalScore, secScores, answeredCount) {
+      const status = getPipelineStatus(totalScore);
+
+      document.getElementById('reportPipelineTitle').textContent = status.title;
+      document.getElementById('reportPipelineDesc').textContent = status.desc;
+      document.getElementById('reportTotalScore').textContent = totalScore;
+
+      const listContainer = document.getElementById('sectionScoreList');
+      if (listContainer) {
+        listContainer.innerHTML = AUDIT_SECTIONS.map(sec => {
+          const sc = secScores[sec.id] || 0;
+          const pct = Math.round((sc / sec.maxScore) * 100);
+          return `
+            <div class="space-y-1">
+              <div class="flex justify-between font-semibold">
+                <span class="text-slate-700">${sec.title}</span>
+                <span class="font-mono text-slate-900">${sc} / ${sec.maxScore} (${pct}%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-brand-600 h-full rounded-full" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderRadarChart(secScores);
+    }
+
+    function getPipelineStatus(score) {
+      if (score <= 40) {
+        return {
+          title: "BLOCKED PIPELINE",
+          desc: "Love is mostly theoretical. Focus on Stage 1 & 2 (Revelation & Reception). Meditate on God's grace and forgiveness.",
+          focus: "Stage 1 & 2 (Revelation & Reception)"
         };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let activeSelectedCategory = "";
-        let currentRecordTokenId = ""; 
-        let uiFormMapInstance = null;
-        let uiFormMapMarker = null;
-        let adminDashboardMapInstance = null;
-        let adminDashboardLayerGroup = null;
-        let globalReconciliationsCache = [];
-        let adminLiveStreamUnsubscribe = null;
-        let loadedBase64GalleryStrings = [];
-        let successPieChartInstance = null;
-        let globalActiveRecipientData = null; // Caches active recipient view record structure
-
-        document.getElementById('f1-gallery').addEventListener('change', function(e) {
-            const files = e.target.files;
-            const previewContainer = document.getElementById('f1-gallery-preview');
-            previewContainer.innerHTML = "";
-            loadedBase64GalleryStrings = [];
-
-            if (files) {
-                Array.from(files).forEach(file => {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        const imgNode = new Image();
-                        imgNode.onload = function() {
-                            const canvasElement = document.createElement('canvas');
-                            let targetWidth = imgNode.width;
-                            let targetHeight = imgNode.height;
-                            const maxSizeConstraint = 800;
-
-                            if (targetWidth > targetHeight) {
-                                if (targetWidth > maxSizeConstraint) {
-                                    targetHeight *= maxSizeConstraint / targetWidth;
-                                    targetWidth = maxSizeConstraint;
-                                }
-                            } else {
-                                if (targetHeight > maxSizeConstraint) {
-                                    targetWidth *= maxSizeConstraint / targetHeight;
-                                    targetHeight = maxSizeConstraint;
-                                }
-                            }
-
-                            canvasElement.width = targetWidth;
-                            canvasElement.height = targetHeight;
-                            const canvasCtx = canvasElement.getContext('2d');
-                            canvasCtx.drawImage(imgNode, 0, 0, targetWidth, targetHeight);
-                            
-                            const highEfficiencyBase64 = canvasElement.toDataURL('image/jpeg', 0.6);
-                            loadedBase64GalleryStrings.push(highEfficiencyBase64);
-                            
-                            const renderImg = document.createElement('img');
-                            renderImg.src = highEfficiencyBase64;
-                            renderImg.className = "gallery-preview-img shadow-md border border-slate-200 image-motion-effect";
-                            previewContainer.appendChild(renderImg);
-                        };
-                        imgNode.src = event.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                });
-            }
-        });
-
-        async function fetchBibleVerseText(verseReference) {
-            if(!verseReference.trim()) return "";
-            try {
-                const cleanedRef = encodeURIComponent(verseReference.trim());
-                const apiEndpoint = `https://labs.bible.org/api/?passage=${cleanedRef}&type=json`;
-                const response = await fetch(apiEndpoint);
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    return data.map(v => `${v.text} (${v.bookname} ${v.chapter}:${v.verse})`).join(" ");
-                }
-                return `[Verse variant mismatch reference: ${verseReference}]`;
-            } catch (error) {
-                return `[Scripture API Fault: ${verseReference}]`;
-            }
-        }
-
-        async function executeFieldFetchAndAssign(searchFieldId, targetTextAreaId, shouldAppend = false) {
-            const queryRef = document.getElementById(searchFieldId).value;
-            if(!queryRef) return alert("Specify a scriptural context token pointer first.");
-            const targetArea = document.getElementById(targetTextAreaId);
-            const dynamicTextResult = await fetchBibleVerseText(queryRef);
-            if(shouldAppend) {
-                targetArea.value = targetArea.value.trim() + (targetArea.value.trim() ? "\n\n" : "") + dynamicTextResult;
-            } else {
-                targetArea.value = dynamicTextResult;
-            }
-            document.getElementById(searchFieldId).value = "";
-        }
-
-        document.getElementById('btn-fetch-prep').addEventListener('click', () => executeFieldFetchAndAssign('admin-prep-search', 'cms-prep-conviction', false));
-        document.getElementById('btn-append-prep').addEventListener('click', () => executeFieldFetchAndAssign('admin-prep-search', 'cms-prep-conviction', true));
-        document.getElementById('btn-fetch-forgive').addEventListener('click', () => executeFieldFetchAndAssign('admin-forgive-search', 'cms-rec-forgive', false));
-        document.getElementById('btn-append-forgive').addEventListener('click', () => executeFieldFetchAndAssign('admin-forgive-search', 'cms-rec-forgive', true));
-        document.getElementById('btn-fetch-healing').addEventListener('click', () => executeFieldFetchAndAssign('admin-healing-search', 'cms-rec-healing', false));
-        document.getElementById('btn-append-healing').addEventListener('click', () => executeFieldFetchAndAssign('admin-healing-search', 'cms-rec-healing', true));
-
-        window.showView = function(viewId) {
-            document.querySelectorAll('.view-section').forEach(section => section.classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
-            if (viewId === 'forms-view') { executeLeafletFormMapInit(); }
-            if (viewId === 'admin-view') { executeAdminDashboardMapInit(); }
+      } else if (score <= 75) {
+        return {
+          title: "LEAKING PIPELINE",
+          desc: "Inconsistent walk. Focus on Stage 4 (Abiding). Establish consistent daily spiritual disciplines.",
+          focus: "Stage 4 (Abiding)"
         };
-
-        document.getElementById('detect-location-btn').addEventListener('click', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const lat = position.coords.latitude.toFixed(6);
-                    const lng = position.coords.longitude.toFixed(6);
-                    document.getElementById('f1-coords').value = `Lat: ${lat}, Lng: ${lng}`;
-                    if (uiFormMapInstance) {
-                        const latLng = new L.LatLng(lat, lng);
-                        uiFormMapInstance.setView(latLng, 14);
-                        if (uiFormMapMarker) uiFormMapMarker.setLatLng(latLng);
-                        else uiFormMapMarker = L.marker(latLng).addTo(uiFormMapInstance);
-                    }
-                }, () => { alert("Spatial telemetry acquisition timed out."); });
-            }
-        });
-
-        function executeLeafletFormMapInit() {
-            if (uiFormMapInstance !== null) { setTimeout(() => { uiFormMapInstance.invalidateSize(); }, 200); return; }
-            uiFormMapInstance = L.map('map').setView([-1.286389, 36.817223], 12);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(uiFormMapInstance);
-            uiFormMapInstance.on('click', function(e) {
-                document.getElementById('f1-coords').value = `Lat: ${e.latlng.lat.toFixed(6)}, Lng: ${e.latlng.lng.toFixed(6)}`;
-                if (uiFormMapMarker) uiFormMapMarker.setLatLng(e.latlng);
-                else uiFormMapMarker = L.marker(e.latlng).addTo(uiFormMapInstance);
-            });
-        }
-
-        document.querySelectorAll('.category-trigger').forEach(trigger => {
-            trigger.addEventListener('click', async () => {
-                activeSelectedCategory = trigger.getAttribute('data-category');
-                document.getElementById('selected-category-badge').innerText = trigger.querySelector('h4').innerText;
-                
-                const spinner = document.getElementById('prep-panel-loading-spinner');
-                const contentArea = document.getElementById('prep-panel-content-area');
-                
-                document.getElementById('scripture-prep-panel').classList.remove('hidden');
-                document.getElementById('scripture-prep-panel').scrollIntoView({ behavior: 'smooth' });
-                
-                spinner.classList.remove('hidden');
-                contentArea.classList.add('hidden');
-                
-                try {
-                    const docSnap = await getDoc(doc(db, "scriptures", activeSelectedCategory));
-                    if (docSnap.exists()) {
-                        document.getElementById('prep-conviction').innerText = docSnap.data().prepConviction || "Assets Pending Verification Log.";
-                        document.getElementById('prep-quote').innerText = docSnap.data().prepQuote || "Context Requirements Pending.";
-                    } else {
-                        document.getElementById('prep-conviction').innerText = "Directives pending database synchronization configuration.";
-                        document.getElementById('prep-quote').innerText = "Awaiting management publishing.";
-                    }
-                } catch (e) { 
-                    console.error(e); 
-                    document.getElementById('prep-conviction').innerText = "Error pulling operational assets from cluster.";
-                } finally {
-                    spinner.classList.add('hidden');
-                    contentArea.classList.remove('hidden');
-                }
-            });
-        });
-
-        document.getElementById('proceed-to-forms-btn').addEventListener('click', () => {
-            document.getElementById('edit-record-id').value = "";
-            document.getElementById('form-category-sub').innerText = "Framework Pipeline Setup: " + activeSelectedCategory;
-            showView('forms-view');
-        });
-
-        document.getElementById('cancel-forms-btn').addEventListener('click', () => showView('landing-view'));
-        document.getElementById('nav-logo').addEventListener('click', () => showView('landing-view'));
-
-        document.getElementById('reconciliation-master-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const sPhone = document.getElementById('f1-phone').value.trim();
-            const rPhone = document.getElementById('f2-phone').value.trim();
-            const recordId = document.getElementById('edit-record-id').value;
-
-            try {
-                const checkBlock = await getDoc(doc(db, "blocks", sPhone));
-                if (checkBlock.exists()) {
-                    alert("Pipeline Suspension Error: This profile number is currently flagged on active restriction rosters.");
-                    return;
-                }
-            } catch(err) { console.error(err); }
-
-            const payload = {
-                category: activeSelectedCategory,
-                status: "Awaiting Admin Review",
-                timestamp: new Date().toISOString(),
-                senderName: document.getElementById('f1-name').value,
-                senderId: document.getElementById('f1-id').value,
-                senderPhone: sPhone,
-                senderCoords: document.getElementById('f1-coords').value,
-                conflictReason: document.getElementById('f1-reason').value,
-                senderApology: document.getElementById('f1-apology').value,
-                senderCitations: document.getElementById('f1-citations').value,
-                recipientName: document.getElementById('f2-name').value,
-                recipientPhone: rPhone,
-                recipientCoords: "",
-                galleryImages: loadedBase64GalleryStrings
-            };
-
-            try {
-                if (recordId) {
-                    await updateDoc(doc(db, "reconciliations", recordId), payload);
-                    alert("Reconciliation profile metadata updated successfully inside global records.");
-                } else {
-                    await addDoc(collection(db, "reconciliations"), payload);
-                    alert("Dossier logs recorded. Entry queued for administrative approval verification.");
-                }
-                document.getElementById('reconciliation-master-form').reset();
-                document.getElementById('f1-gallery-preview').innerHTML = "";
-                showView('landing-view');
-            } catch (err) { alert("Pipeline Transaction Failure: " + err.message); }
-        });
-
-        window.showDeclineModal = function(id) {
-            document.getElementById('modal-decline-record-id').value = id;
-            document.getElementById('decline-reason-modal').classList.remove('hidden');
+      } else if (score <= 105) {
+        return {
+          title: "DEVELOPING PIPELINE",
+          desc: "Good foundation. Focus on Stage 5 & 6 (Steadfastness & Stewardship). Refine conflict handling and integrity.",
+          focus: "Stage 5 & 6 (Steadfastness & Stewardship)"
         };
-
-        document.getElementById('btn-close-decline-modal').addEventListener('click', () => {
-            document.getElementById('decline-reason-modal').classList.add('hidden');
-        });
-
-        document.querySelectorAll('.reason-option-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const id = document.getElementById('modal-decline-record-id').value;
-                const pickedReason = btn.getAttribute('data-reason');
-                try {
-                    await updateDoc(doc(db, "reconciliations", id), {
-                        status: "Declined",
-                        declineReason: pickedReason
-                    });
-                    document.getElementById('decline-reason-modal').classList.add('hidden');
-                    alert("Record updated to Declined with selected validation note.");
-                } catch(err) {
-                    alert("Error registering decline action matrix: " + err.message);
-                }
-            });
-        });
-
-        window.showView = function(viewId) {
-            document.querySelectorAll('.view-section').forEach(section => section.classList.add('hidden'));
-            document.getElementById(viewId).classList.remove('hidden');
-            if (viewId === 'forms-view') { executeLeafletFormMapInit(); }
-            if (viewId === 'admin-view') { executeAdminDashboardMapInit(); if(globalReconciliationsCache.length > 0) { renderAnalyticsDashboardWidgets(globalReconciliationsCache); refreshSpatialAdminIntelligenceLayer(globalReconciliationsCache); } }
+      } else {
+        return {
+          title: "FLOWING PIPELINE",
+          desc: "Kingdom love is actively governing conduct. Focus on Stage 6 (Multiplication). Mentor and disciple others.",
+          focus: "Stage 6 (Multiplication)"
         };
+      }
+    }
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const routeToken = urlParams.get('token');
-            if (routeToken) {
-                currentRecordTokenId = routeToken;
-                showView('recipient-view');
-                
-                try {
-                    const docSnap = await getDoc(doc(db, "reconciliations", currentRecordTokenId));
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        globalActiveRecipientData = data;
+    function renderRadarChart(secScores) {
+      const ctx = document.getElementById('scoreRadarChart');
+      if (!ctx) return;
 
-                        const blockCheck = await getDoc(doc(db, "blocks", data.senderPhone));
-                        if(blockCheck.exists()) {
-                            document.getElementById('recipient-core-panel').classList.add('hidden');
-                            document.getElementById('recipient-ban-shield').classList.remove('hidden');
-                            return;
-                        }
+      const labels = ['Sec A (Rev)', 'Sec B (Rec)', 'Sec C (Exp)', 'Sec D (Abide)', 'Sec E (Stead)', 'Sec F (Stew)', 'Sec G (Mult)'];
+      const dataValues = [
+        secScores.A || 0,
+        secScores.B || 0,
+        secScores.C || 0,
+        secScores.D || 0,
+        secScores.E || 0,
+        secScores.F || 0,
+        secScores.G || 0
+      ];
 
-                        if (data.status === "Awaiting Admin Review") {
-                            document.getElementById('recipient-core-panel').classList.add('hidden');
-                            document.getElementById('recipient-ban-shield').classList.remove('hidden');
-                            document.getElementById('recipient-shield-error').innerText = "This reconciliation track record has not been approved by administrative systems yet.";
-                            return;
-                        } else if (data.status === "Declined") {
-                            document.getElementById('recipient-core-panel').classList.add('hidden');
-                            document.getElementById('recipient-ban-shield').classList.remove('hidden');
-                            document.getElementById('recipient-shield-error').innerHTML = `This axis submission link has been <b>Declined</b> by administration. Reason: <span class="text-rose-600 font-bold">"${data.declineReason || 'No explicit metric metadata logged.'}"</span>`;
-                            return;
-                        }
+      if (radarChartInstance) {
+        radarChartInstance.destroy();
+      }
 
-                        document.getElementById('rec-view-sender-name').innerText = data.senderName;
-                        document.getElementById('rec-view-category-name').innerText = data.category;
-                        document.getElementById('rec-view-reason').innerText = data.conflictReason;
-                        document.getElementById('rec-view-apology').innerText = data.senderApology;
-                        document.getElementById('rec-view-citations').innerText = data.senderCitations || "No historic constraints logged.";
-                        
-                        const previewContainer = document.getElementById('rec-gallery-view');
-                        if(data.galleryImages && data.galleryImages.length > 0) {
-                            previewContainer.innerHTML = "";
-                            data.galleryImages.forEach(baseData => {
-                                const imgNode = document.createElement('img');
-                                imgNode.src = baseData;
-                                imgNode.className = "gallery-preview-img shadow-md border border-slate-200 image-motion-effect";
-                                previewContainer.appendChild(imgNode);
-                            });
-                        }
-
-                        const scriptSnap = await getDoc(doc(db, "scriptures", data.category));
-                        if (scriptSnap.exists()) {
-                            document.getElementById('rec-forgive-scripture').innerText = scriptSnap.data().recForgive || "Awaiting structural validation metrics updates.";
-                            document.getElementById('rec-healing-scripture').innerText = scriptSnap.data().recHealing || "Resolution pathways pending deployment loops.";
-                        }
-                    }
-                } catch(e) { console.error("Tracking reference degradation runtime alert: ", e); }
+      radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Your Kingdom Walk Score',
+            data: dataValues,
+            backgroundColor: 'rgba(225, 29, 72, 0.2)',
+            borderColor: '#e11d48',
+            pointBackgroundColor: '#be123c',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#be123c'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            r: {
+              angleLines: { color: '#e2e8f0' },
+              grid: { color: '#f1f5f9' },
+              suggestedMin: 0,
+              suggestedMax: 20
             }
-        });
-
-        let currentRecipientCoordinatesString = "";
-        document.getElementById('recipient-location-btn').addEventListener('click', () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((pos) => {
-                    currentRecipientCoordinatesString = `Lat: ${pos.coords.latitude.toFixed(6)}, Lng: ${pos.coords.longitude.toFixed(6)}`;
-                    document.getElementById('rec-loc-status').innerText = "Spatial Footprint Authenticated: " + currentRecipientCoordinatesString;
-                }, () => {
-                    currentRecipientCoordinatesString = "Lat: -1.292100, Lng: 36.821900";
-                    document.getElementById('rec-loc-status').innerText = "Default Coordinate Architecture Assigned.";
-                });
-            }
-        });
-
-        // RECIPIENT DECISION DRIVER WITH INSTANT WHATSAPP DISPATCH CORES
-        async function closeRecipientWorkflowRoute(isAcceptedResponse) {
-            if(!currentRecipientCoordinatesString) return alert("Provide spatial authentication footprint parameter maps before submission.");
-            if(!globalActiveRecipientData) return alert("Dossier cache allocation trace failure.");
-            
-            const resolutionStatus = isAcceptedResponse ? "Successful Union Logged" : "Declined";
-            const updatedPayload = {
-                status: resolutionStatus,
-                recipientCoords: currentRecipientCoordinatesString
-            };
-            
-            if(!isAcceptedResponse) {
-                updatedPayload.declineReason = "Declined from Portal Axis Gateway";
-            }
-
-            try {
-                await updateDoc(doc(db, "reconciliations", currentRecordTokenId), updatedPayload);
-                alert("Workflow response registered successfully inside the database engine.");
-                
-                // Formulate target explicit custom text strings for external WhatsApp channel loops
-                let computedWaTextMessage = "";
-                if(isAcceptedResponse) {
-                    computedWaTextMessage = `HeartBridge Update: Match Accepted! Hello ${globalActiveRecipientData.senderName}, your recipient ${globalActiveRecipientData.recipientName} has parsed and formally accepted your reconciliation proposal submission! This connection loop is now closed successfully.`;
-                } else {
-                    computedWaTextMessage = `HeartBridge Update: Hello ${globalActiveRecipientData.senderName}, your structural reconciliation request profile set up for recipient ${globalActiveRecipientData.recipientName} has been declined.`;
-                }
-                
-                const cleanSenderNumber = globalActiveRecipientData.senderPhone.replace(/\+/g, '');
-                const finalRedirectionAddress = `https://wa.me/${cleanSenderNumber}?text=${encodeURIComponent(computedWaTextMessage)}`;
-                
-                window.open(finalRedirectionAddress, '_blank');
-                window.location.href = window.location.pathname;
-            } catch(e) { alert("Data Engine Error: " + e.message); }
+          },
+          plugins: {
+            legend: { display: false }
+          }
         }
+      });
+    }
 
-        document.getElementById('accept-reconciliation-btn').addEventListener('click', () => closeRecipientWorkflowRoute(true));
-        document.getElementById('deconciliation-decline-btn').addEventListener('click', () => closeRecipientWorkflowRoute(false));
+    // 5. FIRESTORE & LOCAL STORAGE PERSISTENCE
+    async function saveAuditToFirebase(redirectToReport = false) {
+      const total = Object.values(userRatings).reduce((a, b) => a + b, 0);
+      const auditPayload = {
+        appId: window.appId,
+        timestamp: new Date().toISOString(),
+        ratings: userRatings,
+        totalScore: total,
+        status: getPipelineStatus(total).title
+      };
 
-        document.getElementById('nav-admin-btn').addEventListener('click', () => {
-            if (auth.currentUser) { showView('admin-view'); } else { showView('auth-view'); }
-        });
+      saveLocalHistory(auditPayload);
 
-        document.getElementById('admin-login-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value)
-                .then(() => { showView('admin-view'); })
-                .catch(err => alert("Authorization Rejected: " + err.message));
-        });
-
-        document.getElementById('admin-logout-btn').addEventListener('click', () => {
-            signOut(auth).then(() => { showView('landing-view'); });
-        });
-
-        function executeAdminDashboardMapInit() {
-            if (adminDashboardMapInstance !== null) { setTimeout(() => { adminDashboardMapInstance.invalidateSize(); }, 200); return; }
-            adminDashboardMapInstance = L.map('admin-map').setView([-1.286389, 36.817223], 11);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(adminDashboardMapInstance);
-            adminDashboardLayerGroup = L.layerGroup().addTo(adminDashboardMapInstance);
+      if (currentUser && db) {
+        try {
+          const safePath = `artifacts/${window.appId}/users/${currentUser.uid}/audits`;
+          await db.collection(safePath).add(auditPayload);
+          alert("Audit successfully saved to your Firebase cloud profile!");
+        } catch (err) {
+          console.error("Error saving to Firestore:", err);
+          alert("Audit saved locally. (Firestore Cloud Sync error: " + err.message + ")");
         }
+      } else {
+        alert("Audit saved locally to this device. Sign in to sync across devices.");
+      }
 
-        // COMPREHENSIVE RE-ENGINEERED PARSING UTILITY FOR SPATIAL STRINGS
-        function parseCoordinatesString(coordinateString) {
-            if (!coordinateString || typeof coordinateString !== 'string') return null;
-            try {
-                const parts = coordinateString.split(',');
-                if (parts.length !== 2) return null;
-                
-                const latPart = parts[0].replace(/Lat:\s*/i, '').trim();
-                const lngPart = parts[1].replace(/Lng:\s*/i, '').trim();
-                
-                const latNum = parseFloat(latPart);
-                const lngNum = parseFloat(lngPart);
-                
-                if (isNaN(latNum) || isNaN(lngNum)) return null;
-                return [latNum, lngNum];
-            } catch(e) {
-                return null;
-            }
+      if (redirectToReport) {
+        switchTab('report');
+      }
+    }
+
+    async function loadUserAuditFromFirestore() {
+      if (!currentUser || !db) return;
+      try {
+        const safePath = `artifacts/${window.appId}/users/${currentUser.uid}/audits`;
+        const snapshot = await db.collection(safePath).orderBy('timestamp', 'desc').limit(1).get();
+
+        if (!snapshot.empty) {
+          const docData = snapshot.docs[0].data();
+          if (docData.ratings) {
+            userRatings = docData.ratings;
+            Object.keys(userRatings).forEach(qId => {
+              setRating(parseInt(qId), userRatings[qId]);
+            });
+          }
         }
+      } catch (err) {
+        console.warn("Could not fetch user cloud history:", err);
+      }
+    }
 
-        function refreshSpatialAdminIntelligenceLayer(recordsArray) {
-            if (!adminDashboardLayerGroup) return;
-            adminDashboardLayerGroup.clearLayers();
-            
-            const senderIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] });
-            const recipientIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+    function saveLocalHistory(payload) {
+      let history = JSON.parse(localStorage.getItem('kingdom_love_history') || '[]');
+      history.unshift(payload);
+      if (history.length > 10) history = history.slice(0, 10);
+      localStorage.setItem('kingdom_love_history', JSON.stringify(history));
+      loadLocalHistory();
+    }
 
-            recordsArray.forEach(record => {
-                const senderLoc = parseCoordinatesString(record.senderCoords);
-                if (senderLoc) { 
-                    L.marker(senderLoc, {icon: senderIcon}).bindPopup(`<b>Sender:</b> ${record.senderName}<br>Category: ${record.category}<br>Role: Initiator (Blue)`).addTo(adminDashboardLayerGroup); 
-                }
-                const recLoc = parseCoordinatesString(record.recipientCoords);
-                if (recLoc) { 
-                    L.marker(recLoc, {icon: recipientIcon}).bindPopup(`<b>Recipient:</b> ${record.recipientName}<br>Status: ${record.status}<br>Role: Target (Red)`).addTo(adminDashboardLayerGroup); 
-                }
-            });
+    function loadLocalHistory() {
+      const container = document.getElementById('historyLogsContainer');
+      if (!container) return;
+
+      const history = JSON.parse(localStorage.getItem('kingdom_love_history') || '[]');
+      if (history.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 italic">No previous saved audits found on this device.</p>`;
+        return;
+      }
+
+      container.innerHTML = history.map((item, idx) => `
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div>
+            <span class="font-bold text-slate-800">${item.status} (${item.totalScore}/125)</span>
+            <span class="text-[10px] text-slate-400 block">${new Date(item.timestamp).toLocaleString()}</span>
+          </div>
+          <span class="text-xs font-bold text-brand-600">Entry #${history.length - idx}</span>
+        </div>
+      `).join('');
+    }
+
+    function clearHistoryLogs() {
+      if (confirm("Are you sure you want to clear your local audit history?")) {
+        localStorage.removeItem('kingdom_love_history');
+        loadLocalHistory();
+      }
+    }
+
+    function resetAuditForm() {
+      if (confirm("Reset all rating inputs to 0?")) {
+        userRatings = {};
+        renderAuditForm();
+        updateCalculations();
+      }
+    }
+
+    // NAVIGATION TAB SWITCHER
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+      ['landing', 'input', 'study', 'report'].forEach(t => {
+        const btn = document.getElementById(`nav-${t}`);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-slate-800 text-rose-300";
+          } else {
+            btn.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300";
+          }
         }
+      });
 
-        // ANALYTICAL COMPUTATION MATRIX AND CHART ENGINE MANAGEMENT LOOP
-        function renderAnalyticsDashboardWidgets(records) {
-            let successCounter = 0;
-            let unsuccessfulCounter = 0;
-            let pendingCounter = 0;
-            
-            const dynamicCategoryChartMap = {
-                "Family Re-union": 0,
-                "Divorcees": 0,
-                "Broken Relationships": 0,
-                "Social Relationships over 18": 0,
-                "Organization": 0
-            };
-
-            records.forEach(rec => {
-                if (rec.status === "Successful Union Logged") {
-                    successCounter++;
-                    if (dynamicCategoryChartMap[rec.category] !== undefined) {
-                        dynamicCategoryChartMap[rec.category]++;
-                    }
-                } else if (rec.status === "Declined") {
-                    unsuccessfulCounter++;
-                } else {
-                    pendingCounter++;
-                }
-            });
-
-            document.getElementById('stat-successful').innerText = successCounter;
-            document.getElementById('stat-unsuccessful').innerText = unsuccessfulCounter;
-            document.getElementById('stat-pending').innerText = pendingCounter;
-
-            // Chart JS Implementation Context initialization parameters
-            const canvasCtx = document.getElementById('successPieChart').getContext('2d');
-            
-            if (successPieChartInstance) {
-                successPieChartInstance.destroy();
-            }
-
-            const chartDataArray = [
-                dynamicCategoryChartMap["Family Re-union"],
-                dynamicCategoryChartMap["Divorcees"],
-                dynamicCategoryChartMap["Broken Relationships"],
-                dynamicCategoryChartMap["Social Relationships over 18"],
-                dynamicCategoryChartMap["Organization"]
-            ];
-
-            successPieChartInstance = new Chart(canvasCtx, {
-                type: 'pie',
-                data: {
-                    labels: ['Family', 'Divorcees', 'Broken Engagement', 'Social (18+)', 'Organization'],
-                    datasets: [{
-                        data: chartDataArray,
-                        backgroundColor: ['#3b82f6', '#a855f7', '#f59e0b', '#f43f5e', '#10b981'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-
-        document.getElementById('btn-execute-csv-export').addEventListener('click', () => {
-            const categoryFilter = document.getElementById('export-category-filter').value;
-            const dateFilter = document.getElementById('export-date-filter').value;
-
-            if(!dateFilter) return alert("Select an explicit calibration tracking date for export validation.");
-
-            const filteredDataset = globalReconciliationsCache.filter(item => {
-                if (item.category !== categoryFilter) return false;
-                if (!item.timestamp) return false;
-                const normalizedItemDate = item.timestamp.split('T')[0];
-                return normalizedItemDate === dateFilter;
-            });
-
-            if(filteredDataset.length === 0) {
-                return alert("No reconciliation matrices found for specified category on chosen target date.");
-            }
-
-            let csvHeaders = ["Record ID", "Timestamp", "Category", "Status", "Sender Name", "Sender Phone", "Sender Coordinates", "Recipient Name", "Recipient Phone", "Recipient Coordinates", "Conflict Reason"];
-            let csvRows = [csvHeaders.join(",")];
-
-            filteredDataset.forEach(row => {
-                let sanitizedReason = (row.conflictReason || "").replace(/"/g, '""');
-                let rowValues = [
-                    `"${row.id}"`,
-                    `"${row.timestamp}"`,
-                    `"${row.category}"`,
-                    `"${row.status}"`,
-                    `"${row.senderName || ''}"`,
-                    `"${row.senderPhone || ''}"`,
-                    `"${row.senderCoords || ''}"`,
-                    `"${row.recipientName || ''}"`,
-                    `"${row.recipientPhone || ''}"`,
-                    `"${row.recipientCoords || ''}"`,
-                    `"${sanitizedReason}"`
-                ];
-                csvRows.push(rowValues.join(","));
-            });
-
-            const csvBlob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
-            const temporaryDownloadLink = document.createElement("a");
-            const compiledFileName = `HeartBridge_Export_${categoryFilter.replace(/\s+/g, '_')}_${dateFilter}.csv`;
-            
-            temporaryDownloadLink.href = URL.createObjectURL(csvBlob);
-            temporaryDownloadLink.setAttribute("download", compiledFileName);
-            temporaryDownloadLink.style.visibility = 'hidden';
-            document.body.appendChild(temporaryDownloadLink);
-            temporaryDownloadLink.click();
-            document.body.removeChild(temporaryDownloadLink);
-        });
-
-        document.getElementById('btn-edit-scripture-prep').addEventListener('click', async () => {
-            const targetCat = document.getElementById('cms-prep-category').value;
-            try {
-                const docSnap = await getDoc(doc(db, "scriptures", targetCat));
-                if(docSnap.exists()) {
-                    document.getElementById('cms-prep-conviction').value = docSnap.data().prepConviction || "";
-                    document.getElementById('cms-prep-quote').value = docSnap.data().prepQuote || "";
-                    alert(`Loaded current Prep criteria for [ ${targetCat} ] into active editing nodes.`);
-                } else {
-                    alert("No existing record context matches discovered for this category yet.");
-                }
-            } catch(ex) { alert("Error pulling criteria layers: " + ex.message); }
-        });
-
-        document.getElementById('btn-edit-scripture-rec').addEventListener('click', async () => {
-            const targetCat = document.getElementById('cms-rec-category').value;
-            try {
-                const docSnap = await getDoc(doc(db, "scriptures", targetCat));
-                if(docSnap.exists()) {
-                    document.getElementById('cms-rec-forgive').value = docSnap.data().recForgive || "";
-                    document.getElementById('cms-rec-healing').value = docSnap.data().recHealing || "";
-                    alert(`Loaded current Resolution criteria for [ ${targetCat} ] into active editing nodes.`);
-                } else {
-                    alert("No existing record context matches discovered for this category yet.");
-                }
-            } catch(ex) { alert("Error pulling criteria layers: " + ex.message); }
-        });
-
-        document.getElementById('btn-delete-scripture-prep').addEventListener('click', async () => {
-            const targetCat = document.getElementById('cms-prep-category').value;
-            if(confirm(`Purge all Prep Fields (Conviction and Quote) for category [ ${targetCat} ]?`)) {
-                try {
-                    await setDoc(doc(db, "scriptures", targetCat), {
-                        prepConviction: "",
-                        prepQuote: ""
-                    }, { merge: true });
-                    document.getElementById('cms-prep-conviction').value = "";
-                    document.getElementById('cms-prep-quote').value = "";
-                    alert("Category prep assets successfully cleared from database registry nodes.");
-                } catch(ex) { alert("Purge Failed: " + ex.message); }
-            }
-        });
-
-        document.getElementById('btn-delete-scripture-rec').addEventListener('click', async () => {
-            const targetCat = document.getElementById('cms-rec-category').value;
-            if(confirm(`Purge all Resolution Fields (Forgiveness and Healing) for category [ ${targetCat} ]?`)) {
-                try {
-                    await setDoc(doc(db, "scriptures", targetCat), {
-                        recForgive: "",
-                        recHealing: ""
-                    }, { merge: true });
-                    document.getElementById('cms-rec-forgive').value = "";
-                    document.getElementById('cms-rec-healing').value = "";
-                    alert("Category resolution parameters dropped from ledger pipeline entries.");
-                } catch(ex) { alert("Purge Failed: " + ex.message); }
-            }
-        });
-
-        function startAdminDashboardRealtimeSync() {
-            if (adminLiveStreamUnsubscribe) adminLiveStreamUnsubscribe();
-            const tableBody = document.getElementById('admin-table-body');
-            
-            adminLiveStreamUnsubscribe = onSnapshot(collection(db, "reconciliations"), (snapshot) => {
-                globalReconciliationsCache = [];
-                tableBody.innerHTML = "";
-
-                snapshot.forEach((docNode) => {
-                    const data = docNode.data();
-                    const id = docNode.id;
-                    globalReconciliationsCache.push({id, ...data});
-
-                    const row = document.createElement('tr');
-                    row.className = "hover:bg-slate-50 border-b border-slate-100 text-[11px]";
-                    
-                    let badgeColor = "bg-amber-100 text-amber-800";
-                    if(data.status === "Approved") badgeColor = "bg-purple-100 text-purple-800";
-                    if(data.status === "Declined") badgeColor = "bg-rose-100 text-rose-800";
-                    if(data.status === "Successful Union Logged") badgeColor = "bg-blue-100 text-blue-800";
-
-                    let statusBadgeMarkup = `<span class="${badgeColor} font-bold px-2.5 py-1 rounded-md block text-center">${data.status}</span>`;
-                    if(data.status === "Declined" && data.declineReason) {
-                        statusBadgeMarkup += `<p class="text-[10px] text-rose-600 italic font-semibold mt-1 max-w-[140px] break-words text-center">Reason: ${data.declineReason}</p>`;
-                    }
-                    
-                    let recipientButtonMarkup = "";
-                    if(data.status === "Approved") {
-                        recipientButtonMarkup = `
-                            <button data-id="${id}" class="btn-admin-wa-recipient bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded shadow-sm" title="WhatsApp Recipient">
-                                <i class="fa-brands fa-whatsapp text-xs"></i> Recipient Link
-                            </button>
-                        `;
-                    } else {
-                        recipientButtonMarkup = `
-                            <button disabled class="bg-slate-200 text-slate-400 px-2 py-1 rounded cursor-not-allowed text-xs" title="Link hidden until Approved">
-                                <i class="fa-solid fa-link-slash"></i> Recipient Locked
-                            </button>
-                        `;
-                    }
-
-                    let operationalControls = `
-                        <div class="flex items-center justify-center gap-1 flex-wrap">
-                            <button data-id="${id}" class="btn-admin-approve bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-1 rounded font-bold" title="Approve Link Transmission">
-                                <i class="fa-solid fa-circle-check"></i> Approve
-                            </button>
-                            <button data-id="${id}" class="btn-admin-decline bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded font-bold" title="Decline & Assign Reason">
-                                <i class="fa-solid fa-circle-xmark"></i> Decline
-                            </button>
-                            <div class="w-full my-0.5 border-t border-slate-100"></div>
-                            <button data-id="${id}" class="btn-admin-wa-sender bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded shadow-sm" title="WhatsApp Sender">
-                                <i class="fa-brands fa-whatsapp text-xs"></i> Sender
-                            </button>
-                            ${recipientButtonMarkup}
-                            <button data-id="${id}" class="btn-admin-edit bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded" title="Edit Entry">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button data-id="${id}" class="btn-admin-delete bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded" title="Delete Log">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                            <button data-phone="${data.senderPhone}" class="btn-toggle-block bg-slate-900 hover:bg-rose-600 text-white px-2 py-1 rounded transition" title="Toggle Access Block">
-                                <i class="fa-solid fa-user-defense"></i> Lock/Unlock Axis
-                            </button>
-                        </div>
-                    `;
-
-                    row.innerHTML = `
-                        <td class="p-4 font-bold text-slate-900">${data.senderName}<br><span class="text-slate-400 font-mono">${data.senderPhone}</span></td>
-                        <td class="p-4 font-bold text-slate-900">${data.recipientName}<br><span class="text-slate-400 font-mono">${data.recipientPhone}</span></td>
-                        <td class="p-4 text-slate-500">${data.category}</td>
-                        <td class="p-4">${statusBadgeMarkup}</td>
-                        <td class="p-4 text-center">${operationalControls}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-
-                document.querySelectorAll('.btn-admin-approve').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const id = btn.getAttribute('data-id');
-                        try {
-                            await updateDoc(doc(db, "reconciliations", id), {
-                                status: "Approved"
-                            });
-                            alert("Dossier profile status has been marked as Approved. Recipient tracking link generation active.");
-                        } catch(err) { alert(err.message); }
-                    });
-                });
-
-                document.querySelectorAll('.btn-admin-decline').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        showDeclineModal(btn.getAttribute('data-id'));
-                    });
-                });
-
-                document.querySelectorAll('.btn-admin-wa-sender').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const rec = globalReconciliationsCache.find(r => r.id === btn.getAttribute('data-id'));
-                        let statusTextMessage = `Status: [ ${rec.status} ].`;
-                        if(rec.status === "Declined") {
-                            statusTextMessage = `Status: [ Declined ]. Reason: "${rec.declineReason || 'Criteria Variant mismatch.'}"`;
-                        }
-                        const txt = encodeURIComponent(`HeartBridge Administrative Update Framework: Hello ${rec.senderName}, we have processed your reconciliation tracking dossier channel initialized for target recipient: ${rec.recipientName}. ${statusTextMessage}`);
-                        window.open(`https://wa.me/${rec.senderPhone.replace(/\+/g, '')}?text=${txt}`, '_blank');
-                    });
-                });
-
-                document.querySelectorAll('.btn-admin-wa-recipient').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const rec = globalReconciliationsCache.find(r => r.id === btn.getAttribute('data-id'));
-                        const targetPortalLink = `${window.location.origin}${window.location.pathname}?token=${rec.id}`;
-                        const txt = encodeURIComponent(`HeartBridge Secure Invitation: Hello ${rec.recipientName}, you have an active alignment engagement proposal request ledger from ${rec.senderName} awaiting your parsing confirmation evaluation. Open your unique gateway here: ${targetPortalLink}`);
-                        window.open(`https://wa.me/${rec.recipientPhone.replace(/\+/g, '')}?text=${txt}`, '_blank');
-                    });
-                });
-
-                document.querySelectorAll('.btn-admin-edit').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const rec = globalReconciliationsCache.find(r => r.id === btn.getAttribute('data-id'));
-                        activeSelectedCategory = rec.category;
-                        document.getElementById('edit-record-id').value = rec.id;
-                        document.getElementById('f1-name').value = rec.senderName;
-                        document.getElementById('f1-id').value = rec.senderId;
-                        document.getElementById('f1-phone').value = rec.senderPhone;
-                        document.getElementById('f1-coords').value = rec.senderCoords;
-                        document.getElementById('f1-reason').value = rec.conflictReason;
-                        document.getElementById('f1-apology').value = rec.senderApology;
-                        document.getElementById('f1-citations').value = rec.senderCitations || "";
-                        document.getElementById('f2-name').value = rec.recipientName;
-                        document.getElementById('f2-phone').value = rec.recipientPhone;
-                        document.getElementById('form-category-sub').innerText = "Editing Record Framework Pin: " + rec.id;
-                        showView('forms-view');
-                    });
-                });
-
-                document.querySelectorAll('.btn-admin-delete').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        if(confirm("Are you absolute on removing this reconciliation tracker context entry from history?")) {
-                            try {
-                                await deleteDoc(doc(db, "reconciliations", btn.getAttribute('data-id')));
-                                alert("Record deleted successfully.");
-                            } catch(err) { alert(err.message); }
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.btn-toggle-block').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        const phoneNum = btn.getAttribute('data-phone');
-                        try {
-                            const blockRef = doc(db, "blocks", phoneNum);
-                            const blockSnap = await getDoc(blockRef);
-                            if(blockSnap.exists()) {
-                                await deleteDoc(blockRef);
-                                alert(`Axis Restored: Phone profile data route [ ${phoneNum} ] open.`);
-                            } else {
-                                await setDoc(blockRef, { blockedAt: new Date().toISOString(), alertTag: "Manual Abuse Record Containment Flag" });
-                                alert(`Axis Restricted: Communication block configuration activated for [ ${phoneNum} ].`);
-                            }
-                        } catch(err) { alert("Fault configuration loop: " + err.message); }
-                    });
-                });
-
-                // Update analytical indicators and maps dynamically inside runtime streams
-                renderAnalyticsDashboardWidgets(globalReconciliationsCache);
-                if(!document.getElementById('admin-view').classList.contains('hidden')) {
-                    refreshSpatialAdminIntelligenceLayer(globalReconciliationsCache);
-                }
-            });
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                document.getElementById('admin-logout-btn').classList.remove('hidden');
-                startAdminDashboardRealtimeSync();
-            } else {
-                document.getElementById('admin-logout-btn').classList.add('hidden');
-            }
-        });
-
-        document.getElementById('admin-cms-prep-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const selectedCat = document.getElementById('cms-prep-category').value;
-            try {
-                await setDoc(doc(db, "scriptures", selectedCat), {
-                    prepConviction: document.getElementById('cms-prep-conviction').value,
-                    prepQuote: document.getElementById('cms-prep-quote').value
-                }, { merge: true });
-                alert("Prep asset layers stored safely inside cluster.");
-                document.getElementById('admin-cms-prep-form').reset();
-            } catch(ex) { alert(ex.message); }
-        });
-
-        document.getElementById('admin-cms-rec-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const selectedCat = document.getElementById('cms-rec-category').value;
-            try {
-                await setDoc(doc(db, "scriptures", selectedCat), {
-                    recForgive: document.getElementById('cms-rec-forgive').value,
-                    recHealing: document.getElementById('cms-rec-healing').value
-                }, { merge: true });
-                alert("Resolution engine criteria updated inside cluster nodes.");
-                document.getElementById('admin-cms-rec-form').reset();
-            } catch(ex) { alert(ex.message); }
-        });
-    </script>
+      if (tabId === 'report') {
+        updateCalculations();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
 </body>
 </html>
