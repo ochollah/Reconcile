@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeartBridge - Production-Ready Reconciliation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .category-container { perspective: 1000px; }
+        .category-pill {
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .category-pill:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 30px -10px rgba(244, 63, 94, 0.15);
+        }
+        .image-motion-effect {
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: grayscale(20%);
+        }
+        .image-motion-effect:hover {
+            transform: scale(1.08) rotate(1deg);
+            filter: grayscale(0%);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        #map, #admin-map { 
+            height: 320px; 
+            border-radius: 1.5rem; 
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);
+            z-index: 1;
+        }
+        #admin-map { height: 420px; }
+        .gallery-preview-img {
+            object-fit: cover;
+            width: 100%;
+            height: 90px;
+            border-radius: 0.75rem;
+            cursor: zoom-in;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 antialiased selection:bg-rose-500 selection:text-white">
+
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3 cursor-pointer group" id="nav-logo">
+                <div class="w-10 h-10 bg-gradient-to-tr from-rose-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition">
+                    <i class="fa-solid fa-heart-pulse text-white text-xl"></i>
+                </div>
+                <span class="font-black text-xl tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">HeartBridge</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button id="nav-admin-btn" class="text-xs font-bold text-slate-700 hover:text-rose-600 bg-slate-100/80 hover:bg-rose-50 border border-slate-200 px-4 py-2.5 rounded-xl hover:border-rose-200 transition-all duration-200">
+                    <i class="fa-solid fa-user-gear mr-1.5"></i> Admin Portal
+                </button>
+                <button id="admin-logout-btn" class="hidden text-xs font-bold text-amber-700 hover:text-white bg-amber-50 hover:bg-amber-600 border border-amber-200 px-4 py-2.5 rounded-xl transition-all duration-200">
+                    <i class="fa-solid fa-arrow-right-from-bracket mr-1.5"></i> Sign Out
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-12">
+
+        <section id="landing-view" class="view-section space-y-16">
+            <div class="text-center space-y-4 max-w-2xl mx-auto">
+                <span class="bg-rose-100 text-rose-700 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Restoration Engine</span>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">Initiate a Path to Reconciliation</h1>
+                <p class="text-slate-500 text-base"><b>​Matthew 5:23-24</b><br>
+​"Therefore, if you are offering your gift at the altar and there remember that your brother or sister has something against you, leave your gift there in front of the altar. First go and be reconciled to them; then come and offer your gift."
+<br>​<b><u>The Ultimate Unity</u><br>
+​Ephesians 2:14–16</b><br>
+​"For he himself is our peace, who has made the two groups one and has destroyed the barrier, the dividing wall of hostility... His purpose was to create in himself one new humanity out of the two, thus making peace, and in one body to reconcile both of them to God through the cross, by which he put to death their hostility.<br><b>Select your structural relationship framework below to build a meaningful path towards understanding and collective healing.</b></p>
+            </div>
+
+            <div class="category-container max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
+                <div data-category="Family Re-union" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-blue-400">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-people-roof text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Family Re-union</h4>
+                        <p class="text-slate-400 text-[11px] mt-0.5">Parents & Children Paths</p>
+                    </div>
+                </div>
+                
+                <div data-category="Divorcees" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-purple-400">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-purple-500 to-fuchsia-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-ring text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Divorcees</h4>
+                        <p class="text-slate-400 text-[11px] mt-0.5">Spousal Re-engagement</p>
+                    </div>
+                </div>
+
+                <div data-category="Broken Relationships" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-amber-400">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-heart-crack text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Broken Engagement</h4>
+                        <p class="text-slate-400 text-[11px] mt-0.5">Betrothal Alignment</p>
+                    </div>
+                </div>
+
+                <div data-category="Social Relationships over 18" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-rose-400">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-id-card text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Adult Social (18+)</h4>
+                        <p class="text-slate-400 text-[11px] mt-0.5">Partnership Remediation</p>
+                    </div>
+                </div>
+
+                <div data-category="Organization" class="category-trigger category-pill bg-white border border-slate-200/80 rounded-2xl p-6 flex items-center space-x-4 shadow-sm hover:border-emerald-400">
+                    <div class="w-16 h-16 shrink-0 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-briefcase text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-extrabold text-slate-900 text-sm leading-tight">Organization</h4>
+                        <p class="text-slate-400 text-[11px] mt-0.5">Workplace & Guild Systems</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="scripture-prep-panel" class="hidden bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6 max-w-2xl mx-auto transform transition-all duration-300">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-lg text-slate-900 flex items-center"><i class="fa-solid fa-scroll text-rose-500 mr-2"></i> Foundational Directives</h3>
+                    <span id="selected-category-badge" class="bg-rose-50 text-rose-700 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider border border-rose-100">Category</span>
+                </div>
+                <div id="prep-panel-loading-spinner" class="hidden text-center py-6">
+                    <i class="fa-solid fa-circle-notch animate-spin text-rose-500 text-3xl"></i>
+                    <p class="text-xs text-slate-400 mt-2 font-medium">Synchronizing context criteria arrays...</p>
+                </div>
+                <div id="prep-panel-content-area" class="space-y-4">
+                    <div class="bg-slate-50 border-l-4 border-amber-500 p-4 text-sm text-slate-700 rounded-r-xl shadow-sm">
+                        <p class="font-bold text-amber-800 text-xs uppercase tracking-wide mb-1"><i class="fa-solid fa-book-open mr-1.5"></i> Conviction & Acknowledgment Scripture:</p>
+                        <p id="prep-conviction" class="whitespace-pre-line italic font-serif text-slate-600 leading-relaxed">Loading context constraints...</p>
+                    </div>
+                    <div class="bg-slate-50 border-l-4 border-emerald-500 p-4 text-sm text-slate-700 rounded-r-xl shadow-sm">
+                        <p class="font-bold text-emerald-800 text-xs uppercase tracking-wide mb-1"><i class="fa-solid fa-quote-left mr-1.5"></i> Strategic Encouragement:</p>
+                        <p id="prep-quote" class="italic text-slate-600 leading-relaxed">Loading details...</p>
+                    </div>
+                </div>
+                <div class="pt-2 text-right">
+                    <button id="proceed-to-forms-btn" class="w-full sm:w-auto bg-slate-900 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl hover:bg-slate-800 shadow-lg transition-all duration-200">
+                        Proceed to Forms <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="forms-view" class="view-section hidden max-w-3xl mx-auto">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+                <div class="bg-slate-950 px-8 py-6 text-white flex justify-between items-center">
+                    <div>
+                        <h2 class="font-black text-xl tracking-tight">Reconciliation Dossier Submission</h2>
+                        <p id="form-category-sub" class="text-xs text-slate-400 font-medium mt-0.5">Category Tracking Active</p>
+                    </div>
+                    <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-rose-400">
+                        <i class="fa-solid fa-folder-plus"></i>
+                    </div>
+                </div>
+
+                <form id="reconciliation-master-form" class="p-8 space-y-8">
+                    <input type="hidden" id="edit-record-id" value="">
+                    <div class="space-y-5">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">Form 1: Identity & Apology Context</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Your Full Name (National ID)</label>
+                                <input type="text" id="f1-name" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">National ID Number <span class="text-rose-500">*</span></label>
+                                <input type="text" id="f1-id" required pattern="^[0-9]{5,12}$" placeholder="Numeric format" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1.5">Your WhatsApp Phone Number</label>
+                            <input type="tel" id="f1-phone" placeholder="e.g., +2547XXXXXXXX" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="block text-xs font-bold text-slate-700">Pin Your Exact Location</label>
+                                <button type="button" id="detect-location-btn" class="text-[10px] bg-rose-50 text-rose-700 font-extrabold px-2.5 py-1 rounded-lg border border-rose-200 hover:bg-rose-100 transition">
+                                    <i class="fa-solid fa-location-crosshairs mr-1"></i> Auto-Detect
+                                </button>
+                            </div>
+                            <div id="map" class="border border-slate-200 mb-2"></div>
+                            <input type="text" id="f1-coords" readonly required placeholder="Coordinates verified through mapping engine" class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-600 outline-none">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-slate-700">Upload Shared Memories / Gallery Files</label>
+                            <input type="file" id="f1-gallery" multiple accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-50 file:text-rose-700 hover:file:bg-rose-100 file:cursor-pointer">
+                            <div id="f1-gallery-preview" class="grid grid-cols-4 sm:grid-cols-6 gap-3 pt-2"></div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Reason for Separation</label>
+                                <textarea id="f1-reason" rows="3" required placeholder="State objectively your perspective..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition"></textarea>
+                            </div>
+                            <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200 text-xs text-amber-900 leading-relaxed">
+                                <label class="flex items-start space-x-3 cursor-pointer">
+                                    <input type="checkbox" required class="mt-0.5 h-4 w-4 rounded text-rose-600 focus:ring-rose-500 border-slate-300">
+                                    <span class="font-medium">I verify that resolution of systemic variance is more critical than maintaining interpersonal fault metrics.</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Your Heartfelt Apology Statement</label>
+                                <textarea id="f1-apology" rows="3" required placeholder="Write your expressive statement..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Covenant Citations & Commitments</label>
+                                <textarea id="f1-citations" rows="3" placeholder="Input specific historic commitments, values, or binding baseline promises..." class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 pt-6 border-t border-slate-100">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Form 2: Target Recipient Registry</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Recipient's Full Name</label>
+                                <input type="text" id="f2-name" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Recipient's WhatsApp Number</label>
+                                <input type="tel" id="f2-phone" placeholder="e.g., +2547XXXXXXXX" required class="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-between items-center border-t border-slate-100">
+                        <button type="button" id="cancel-forms-btn" class="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 transition">Cancel</button>
+                        <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl transition shadow-lg">
+                            Submit & Complete Pipeline Trace
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="recipient-view" class="view-section hidden max-w-3xl mx-auto space-y-6">
+            <div id="recipient-ban-shield" class="hidden bg-white p-8 rounded-3xl border border-slate-200 text-center space-y-4 shadow-xl">
+                <i class="fa-solid fa-user-shield text-rose-500 text-5xl"></i>
+                <h3 class="text-xl font-black text-slate-900">Communication Axis Restricted</h3>
+                <p id="recipient-shield-error" class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">This axis has been closed down due to administrative block configurations associated with safety flags.</p>
+                <button onclick="window.location.reload()" class="bg-slate-900 text-white text-xs font-bold tracking-wider px-4 py-2.5 rounded-xl uppercase">Return Home</button>
+            </div>
+
+            <div id="recipient-core-panel" class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+                <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white px-8 py-8 flex justify-between items-center border-b border-white/10">
+                    <div>
+                        <span class="bg-rose-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">Active Invite</span>
+                        <h2 class="font-black text-2xl tracking-tight mt-1.5">Relationship Resolution Portal</h2>
+                        <p class="text-xs text-slate-400 font-medium mt-0.5">Review verified structural accounts and heartfelt baseline communications.</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-md">
+                        <i class="fa-solid fa-envelope-open-text text-rose-400 text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="p-8 space-y-8">
+                    <div class="space-y-3">
+                        <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">Step 1: Confirm Receipt Location Framework</h4>
+                        <button id="recipient-location-btn" type="button" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-location-dot text-rose-500 animate-bounce"></i>
+                            <span id="rec-loc-status">Authorize Location Validation Entry</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-black text-xs text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2">Step 2: Review Sender Message & Dossier Logs</h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 p-5 rounded-2xl border border-slate-200/60 shadow-sm space-y-1">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sender Name Context</span>
+                                <p id="rec-view-sender-name" class="font-bold text-slate-800 text-sm">...</p>
+                            </div>
+                            <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 p-5 rounded-2xl border border-slate-200/60 shadow-sm space-y-1">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Relationship Category</span>
+                                <p id="rec-view-category-name" class="font-bold text-slate-800 text-sm text-indigo-600">...</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 pt-2">
+                            <div class="bg-amber-50/40 border border-amber-200/70 p-5 rounded-2xl space-y-2 shadow-sm">
+                                <div class="flex items-center space-x-2 text-amber-800">
+                                    <i class="fa-solid fa-circle-exclamation text-sm"></i>
+                                    <span class="font-bold text-xs uppercase tracking-wider">Stated Conflict Reason</span>
+                                </div>
+                                <p id="rec-view-reason" class="text-slate-700 text-sm font-medium leading-relaxed italic">...</p>
+                            </div>
+
+                            <div class="bg-rose-50/40 border border-rose-200/70 p-6 rounded-2xl space-y-2 shadow-sm relative overflow-hidden">
+                                <div class="absolute right-4 top-4 text-rose-200/40 text-6xl pointer-events-none font-serif font-black">“</div>
+                                <div class="flex items-center space-x-2 text-rose-800">
+                                    <i class="fa-solid fa-heart text-sm"></i>
+                                    <span class="font-bold text-xs uppercase tracking-wider">Apology Statement Matrix</span>
+                                </div>
+                                <p id="rec-view-apology" class="text-slate-800 text-sm font-semibold leading-relaxed font-serif">...</p>
+                            </div>
+
+                            <div class="bg-indigo-50/40 border border-indigo-200/70 p-5 rounded-2xl space-y-2 shadow-sm">
+                                <div class="flex items-center space-x-2 text-indigo-800">
+                                    <i class="fa-solid fa-scroll text-sm"></i>
+                                    <span class="font-bold text-xs uppercase tracking-wider">Covenant Citations & Commitments</span>
+                                </div>
+                                <p id="rec-view-citations" class="text-slate-700 text-sm font-medium leading-relaxed">...</p>
+                            </div>
+                            
+                            <div class="space-y-2 pt-2">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Shared Memories Gallery Preview</span>
+                                <div id="rec-gallery-view" class="grid grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                                    <p class="text-slate-400 italic text-[11px] col-span-4">No gallery pictures linked to this tracking run.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 border-t border-slate-100 pt-6">
+                        <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">Step 3: Scriptural Forgiveness Architecture</h4>
+                        <div class="bg-slate-50 border-l-4 border-indigo-600 p-4 text-xs text-slate-700 rounded-r-xl shadow-sm">
+                            <p class="font-bold text-indigo-800 uppercase tracking-wide mb-1"><i class="fa-solid fa-hand-holding-heart mr-1"></i> Foundational Forgiveness Directives:</p>
+                            <p id="rec-forgive-scripture" class="whitespace-pre-line italic font-serif text-slate-600 leading-relaxed">Loading parameters...</p>
+                        </div>
+                        <div class="bg-slate-50 border-l-4 border-emerald-600 p-4 text-xs text-slate-700 rounded-r-xl shadow-sm">
+                            <p class="font-bold text-emerald-800 uppercase tracking-wide mb-1"><i class="fa-solid fa-kit-medical mr-1"></i> Divine Healing Matrix:</p>
+                            <p id="rec-healing-scripture" class="whitespace-pre-line italic font-serif text-slate-600 leading-relaxed">Loading database context...</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-slate-100 space-y-4 bg-gradient-to-b from-transparent to-slate-50/80 p-4 rounded-2xl">
+                        <div class="text-center max-w-md mx-auto space-y-2">
+                            <h3 class="font-black text-lg text-slate-900 tracking-tight">Make Your Decision</h3>
+                            <p class="text-xs text-slate-500 leading-relaxed">Accepting closes the separation loop. Declining provides structured closure. Choose path alignment.</p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button id="accept-reconciliation-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider py-4 rounded-xl transition shadow-lg shadow-emerald-100">
+                                <i class="fa-solid fa-square-check mr-1.5"></i> Accept Reconciliation Proposal
+                            </button>
+                            <button id="deconciliation-decline-btn" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs uppercase tracking-wider px-6 py-4 rounded-xl transition">
+                                Decline Proposal Log
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="auth-view" class="view-section hidden max-w-md mx-auto">
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto text-xl shadow-sm">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="font-black text-xl text-slate-900 tracking-tight">Admin Authorization Required</h3>
+                    <p class="text-xs text-slate-400">Provide administrative credentials to view system data arrays.</p>
+                </div>
+                <form id="admin-login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Operational Email Address</label>
+                        <input type="email" id="auth-email" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5">Security Access Password</label>
+                        <input type="password" id="auth-password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 text-white text-xs font-bold uppercase tracking-wider py-4 rounded-xl hover:bg-slate-800 transition shadow">
+                        Verify Credentials & Open Ledger
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="admin-view" class="view-section hidden space-y-8">
+            <div class="flex justify-between items-center flex-wrap gap-4 border-b border-slate-200 pb-5">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">System Core Analytics & Verification</h2>
+                    <p class="text-xs text-emerald-600 font-mono font-bold mt-0.5"><i class="fa-solid fa-circle-check"></i> Connected to live Firebase instance</p>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 flex flex-wrap items-center gap-3 shadow-sm">
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filter Export Target Category</label>
+                        <select id="export-category-filter" class="bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs outline-none">
+                            <option value="Family Re-union">Family Re-union</option>
+                            <option value="Divorcees">Divorcees</option>
+                            <option value="Broken Relationships">Broken Engagement</option>
+                            <option value="Social Relationships over 18">Adult Social (18+)</option>
+                            <option value="Organization">Organization</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Filter Export Timestamp Target</label>
+                        <input type="date" id="export-date-filter" class="bg-slate-50 border border-slate-200 rounded-xl p-1.5 text-xs outline-none">
+                    </div>
+                    <button id="btn-execute-csv-export" class="h-9 px-4 mt-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition shadow flex items-center gap-2">
+                        <i class="fa-solid fa-file-csv text-base"></i> Export to CSV
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl"><i class="fa-solid fa-circle-check"></i></div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Successful Unions</p>
+                        <h3 id="stat-successful" class="text-2xl font-black text-slate-900">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+                    <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600 text-xl"><i class="fa-solid fa-circle-xmark"></i></div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Declined Loops</p>
+                        <h3 id="stat-unsuccessful" class="text-2xl font-black text-slate-900">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 flex items-center space-x-4 shadow-sm">
+                    <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 text-xl"><i class="fa-solid fa-spinner animate-spin"></i></div>
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pending Review</p>
+                        <h3 id="stat-pending" class="text-2xl font-black text-slate-900">0</h3>
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-col justify-center items-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Success Categories Distribution</p>
+                    <div class="w-full max-w-[120px] h-[120px] relative">
+                        <canvas id="successPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+                <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">Spatial Analytics: Dual-Marker Tracking Grid</h4>
+                <div id="admin-map" class="border border-slate-200"></div>
+                <p class="text-[10px] text-slate-400 font-medium italic"><i class="fa-solid fa-circle-info"></i> Legend Matrix: Blue markers denote Senders. Red markers flag Target Recipients.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-slate-50 px-5 py-4 border-b border-slate-200 font-bold text-xs text-slate-500 uppercase tracking-wider">
+                    Pipeline Transactional Logs & Moderation Controls
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-slate-100/50 border-b border-slate-200 text-slate-500 font-bold">
+                                <th class="p-4">Sender Info</th>
+                                <th class="p-4">Recipient Info</th>
+                                <th class="p-4">Classification</th>
+                                <th class="p-4">Status / Reason</th>
+                                <th class="p-4 text-center">Moderation & Enforcement Controls</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <h4 class="font-bold text-sm text-slate-900 uppercase tracking-tight flex items-center"><i class="fa-solid fa-pen-to-square text-rose-500 mr-1.5"></i> CMS Engine: Publish Prep Assets</h4>
+                        <div class="flex gap-1">
+                            <button type="button" id="btn-edit-scripture-prep" class="bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-blue-200 transition">
+                                <i class="fa-solid fa-edit"></i> Edit Core
+                            </button>
+                            <button type="button" id="btn-delete-scripture-prep" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-red-200 transition">
+                                <i class="fa-solid fa-dumpster-fire"></i> Purge Prep Fields
+                            </button>
+                        </div>
+                    </div>
+                    <form id="admin-cms-prep-form" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Target Classification</label>
+                            <select id="cms-prep-category" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/10">
+                                <option value="Family Re-union">Family Re-union</option>
+                                <option value="Divorcees">Divorcees</option>
+                                <option value="Broken Relationships">Broken Engagement</option>
+                                <option value="Social Relationships over 18">Adult Social (18+)</option>
+                                <option value="Organization">Organization</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Conviction Scripture Text</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="admin-prep-search" placeholder="Verse reference (e.g., Genesis 1:1)" class="flex-1 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs outline-none">
+                                <button type="button" id="btn-fetch-prep" class="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 rounded-xl">Fetch</button>
+                                <button type="button" id="btn-append-prep" class="bg-emerald-600 text-white text-[10px] px-3 rounded-xl"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <textarea id="cms-prep-conviction" required rows="4" placeholder="Scripture text database..." class="w-full border border-slate-200 rounded-xl mt-2 p-3 text-xs outline-none bg-slate-50 font-serif leading-relaxed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Encouragement Quote Reference</label>
+                            <input type="text" id="cms-prep-quote" required placeholder="Encouragement context parameter..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition">Publish/Update Prep Assets</button>
+                    </form>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <h4 class="font-bold text-sm text-slate-900 uppercase tracking-tight flex items-center"><i class="fa-solid fa-signature text-rose-500 mr-1.5"></i> CMS Engine: Publish Recipient Assets</h4>
+                        <div class="flex gap-1">
+                            <button type="button" id="btn-edit-scripture-rec" class="bg-blue-50 text-blue-600 hover:bg-blue-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-blue-200 transition">
+                                <i class="fa-solid fa-edit"></i> Edit Core
+                            </button>
+                            <button type="button" id="btn-delete-scripture-rec" class="bg-red-50 text-red-600 hover:bg-red-100 text-[10px] font-bold tracking-wider px-2 py-1 rounded border border-red-200 transition">
+                                <i class="fa-solid fa-dumpster-fire"></i> Purge Resolution Fields
+                            </button>
+                        </div>
+                    </div>
+                    <form id="admin-cms-rec-form" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Target Classification</label>
+                            <select id="cms-rec-category" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:bg-white focus:ring-2 focus:ring-rose-500/10">
+                                <option value="Family Re-union">Family Re-union</option>
+                                <option value="Divorcees">Divorcees</option>
+                                <option value="Broken Relationships">Broken Engagement</option>
+                                <option value="Social Relationships over 18">Adult Social (18+)</option>
+                                <option value="Organization">Organization</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Core Forgiveness Directive Reference</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="admin-forgive-search" placeholder="Verse reference (e.g., Mark 11:25)" class="flex-1 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs outline-none">
+                                <button type="button" id="btn-fetch-forgive" class="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 rounded-xl">Fetch</button>
+                                <button type="button" id="btn-append-forgive" class="bg-emerald-600 text-white text-[10px] px-3 rounded-xl"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <textarea id="cms-rec-forgive" required rows="3" placeholder="Forgiveness directive details..." class="w-full border border-slate-200 rounded-xl mt-2 p-3 text-xs outline-none bg-slate-50 font-serif leading-relaxed"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-500 mb-1">Core Healing Reference</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="admin-healing-search" placeholder="Verse reference (e.g., Proverbs 17:22)" class="flex-1 border border-slate-200 rounded-xl px-2.5 py-1.5 text-xs outline-none">
+                                <button type="button" id="btn-fetch-healing" class="bg-blue-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 rounded-xl">Fetch</button>
+                                <button type="button" id="btn-append-healing" class="bg-emerald-600 text-white text-[10px] px-3 rounded-xl"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <textarea id="cms-rec-healing" required rows="3" placeholder="Healing metrics..." class="w-full border border-slate-200 rounded-xl mt-2 p-3 text-xs outline-none bg-slate-50 font-serif leading-relaxed"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-slate-900 text-white font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition">Publish/Update Resolution Assets</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="decline-reason-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 max-w-sm w-full p-6 space-y-4">
+            <div>
+                <h3 class="font-black text-slate-900 text-base">Select Decline Reason</h3>
+                <p class="text-[11px] text-slate-400">This feedback matrix note is transmitted directly back to the sender channel loop.</p>
+            </div>
+            <input type="hidden" id="modal-decline-record-id" value="">
+            <div class="space-y-2">
+                <button type="button" data-reason="Recipient dont want to talk" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">Recipient dont want to talk</button>
+                <button type="button" data-reason="False information" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">False information</button>
+                <button type="button" data-reason="Inadequate information" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">Inadequate information</button>
+                <button type="button" data-reason="Wrong phones number provided" class="reason-option-btn w-full text-left text-xs bg-slate-50 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 rounded-xl px-4 py-3 font-semibold transition">Wrong phones number provided</button>
+            </div>
+            <div class="text-right">
+                <button type="button" id="btn-close-decline-modal" class="text-xs font-bold text-slate-400 hover:text-slate-600 transition uppercase tracking-wider">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, addDoc, collection, onSnapshot, updateDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGfr63u8FXuq_bTC3mEaEjNl73K0dCDXw",
+            authDomain: "meet-c6ce0.firebaseapp.com",
+            databaseURL: "https://meet-c6ce0-default-rtdb.firebaseio.com",
+            projectId: "meet-c6ce0",
+            storageBucket: "meet-c6ce0.firebasestorage.app",
+            messagingSenderId: "1041790359684",
+            appId: "1:1041790359684:web:433f70c0addb443703cad1",
+            measurementId: "G-88BB7S3VXY"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let activeSelectedCategory = "";
+        let currentRecordTokenId = ""; 
+        let uiFormMapInstance = null;
+        let uiFormMapMarker = null;
+        let adminDashboardMapInstance = null;
+        let adminDashboardLayerGroup = null;
+        let globalReconciliationsCache = [];
+        let adminLiveStreamUnsubscribe = null;
+        let loadedBase64GalleryStrings = [];
+        let successPieChartInstance = null;
+        let globalActiveRecipientData = null; // Caches active recipient view record structure
+
+        document.getElementById('f1-gallery').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('f1-gallery-preview');
+            previewContainer.innerHTML = "";
+            loadedBase64GalleryStrings = [];
+
+            if (files) {
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const imgNode = new Image();
+                        imgNode.onload = function() {
+                            const canvasElement = document.createElement('canvas');
+                            let targetWidth = imgNode.width;
+                            let targetHeight = imgNode.height;
+                            const maxSizeConstraint = 800;
+
+                            if (targetWidth > targetHeight) {
+                                if (targetWidth > maxSizeConstraint) {
+                                    targetHeight *= maxSizeConstraint / targetWidth;
+                                    targetWidth = maxSizeConstraint;
+                                }
+                            } else {
+                                if (targetHeight > maxSizeConstraint) {
+                                    targetWidth *= maxSizeConstraint / targetHeight;
+                                    targetHeight = maxSizeConstraint;
+                                }
+                            }
+
+                            canvasElement.width = targetWidth;
+                            canvasElement.height = targetHeight;
+                            const canvasCtx = canvasElement.getContext('2d');
+                            canvasCtx.drawImage(imgNode, 0, 0, targetWidth, targetHeight);
+                            
+                            const highEfficiencyBase64 = canvasElement.toDataURL('image/jpeg', 0.6);
+                            loadedBase64GalleryStrings.push(highEfficiencyBase64);
+                            
+                            const renderImg = document.createElement('img');
+                            renderImg.src = highEfficiencyBase64;
+                            renderImg.className = "gallery-preview-img shadow-md border border-slate-200 image-motion-effect";
+                            previewContainer.appendChild(renderImg);
+                        };
+                        imgNode.src = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        async function fetchBibleVerseText(verseReference) {
+            if(!verseReference.trim()) return "";
+            try {
+                const cleanedRef = encodeURIComponent(verseReference.trim());
+                const apiEndpoint = `https://labs.bible.org/api/?passage=${cleanedRef}&type=json`;
+                const response = await fetch(apiEndpoint);
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    return data.map(v => `${v.text} (${v.bookname} ${v.chapter}:${v.verse})`).join(" ");
+                }
+                return `[Verse variant mismatch reference: ${verseReference}]`;
+            } catch (error) {
+                return `[Scripture API Fault: ${verseReference}]`;
+            }
+        }
+
+        async function executeFieldFetchAndAssign(searchFieldId, targetTextAreaId, shouldAppend = false) {
+            const queryRef = document.getElementById(searchFieldId).value;
+            if(!queryRef) return alert("Specify a scriptural context token pointer first.");
+            const targetArea = document.getElementById(targetTextAreaId);
+            const dynamicTextResult = await fetchBibleVerseText(queryRef);
+            if(shouldAppend) {
+                targetArea.value = targetArea.value.trim() + (targetArea.value.trim() ? "\n\n" : "") + dynamicTextResult;
+            } else {
+                targetArea.value = dynamicTextResult;
+            }
+            document.getElementById(searchFieldId).value = "";
+        }
+
+        document.getElementById('btn-fetch-prep').addEventListener('click', () => executeFieldFetchAndAssign('admin-prep-search', 'cms-prep-conviction', false));
+        document.getElementById('btn-append-prep').addEventListener('click', () => executeFieldFetchAndAssign('admin-prep-search', 'cms-prep-conviction', true));
+        document.getElementById('btn-fetch-forgive').addEventListener('click', () => executeFieldFetchAndAssign('admin-forgive-search', 'cms-rec-forgive', false));
+        document.getElementById('btn-append-forgive').addEventListener('click', () => executeFieldFetchAndAssign('admin-forgive-search', 'cms-rec-forgive', true));
+        document.getElementById('btn-fetch-healing').addEventListener('click', () => executeFieldFetchAndAssign('admin-healing-search', 'cms-rec-healing', false));
+        document.getElementById('btn-append-healing').addEventListener('click', () => executeFieldFetchAndAssign('admin-healing-search', 'cms-rec-healing', true));
+
+        window.showView = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            if (viewId === 'forms-view') { executeLeafletFormMapInit(); }
+            if (viewId === 'admin-view') { executeAdminDashboardMapInit(); }
+        };
+
+        document.getElementById('detect-location-btn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lng = position.coords.longitude.toFixed(6);
+                    document.getElementById('f1-coords').value = `Lat: ${lat}, Lng: ${lng}`;
+                    if (uiFormMapInstance) {
+                        const latLng = new L.LatLng(lat, lng);
+                        uiFormMapInstance.setView(latLng, 14);
+                        if (uiFormMapMarker) uiFormMapMarker.setLatLng(latLng);
+                        else uiFormMapMarker = L.marker(latLng).addTo(uiFormMapInstance);
+                    }
+                }, () => { alert("Spatial telemetry acquisition timed out."); });
+            }
+        });
+
+        function executeLeafletFormMapInit() {
+            if (uiFormMapInstance !== null) { setTimeout(() => { uiFormMapInstance.invalidateSize(); }, 200); return; }
+            uiFormMapInstance = L.map('map').setView([-1.286389, 36.817223], 12);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(uiFormMapInstance);
+            uiFormMapInstance.on('click', function(e) {
+                document.getElementById('f1-coords').value = `Lat: ${e.latlng.lat.toFixed(6)}, Lng: ${e.latlng.lng.toFixed(6)}`;
+                if (uiFormMapMarker) uiFormMapMarker.setLatLng(e.latlng);
+                else uiFormMapMarker = L.marker(e.latlng).addTo(uiFormMapInstance);
+            });
+        }
+
+        document.querySelectorAll('.category-trigger').forEach(trigger => {
+            trigger.addEventListener('click', async () => {
+                activeSelectedCategory = trigger.getAttribute('data-category');
+                document.getElementById('selected-category-badge').innerText = trigger.querySelector('h4').innerText;
+                
+                const spinner = document.getElementById('prep-panel-loading-spinner');
+                const contentArea = document.getElementById('prep-panel-content-area');
+                
+                document.getElementById('scripture-prep-panel').classList.remove('hidden');
+                document.getElementById('scripture-prep-panel').scrollIntoView({ behavior: 'smooth' });
+                
+                spinner.classList.remove('hidden');
+                contentArea.classList.add('hidden');
+                
+                try {
+                    const docSnap = await getDoc(doc(db, "scriptures", activeSelectedCategory));
+                    if (docSnap.exists()) {
+                        document.getElementById('prep-conviction').innerText = docSnap.data().prepConviction || "Assets Pending Verification Log.";
+                        document.getElementById('prep-quote').innerText = docSnap.data().prepQuote || "Context Requirements Pending.";
+                    } else {
+                        document.getElementById('prep-conviction').innerText = "Directives pending database synchronization configuration.";
+                        document.getElementById('prep-quote').innerText = "Awaiting management publishing.";
+                    }
+                } catch (e) { 
+                    console.error(e); 
+                    document.getElementById('prep-conviction').innerText = "Error pulling operational assets from cluster.";
+                } finally {
+                    spinner.classList.add('hidden');
+                    contentArea.classList.remove('hidden');
+                }
+            });
+        });
+
+        document.getElementById('proceed-to-forms-btn').addEventListener('click', () => {
+            document.getElementById('edit-record-id').value = "";
+            document.getElementById('form-category-sub').innerText = "Framework Pipeline Setup: " + activeSelectedCategory;
+            showView('forms-view');
+        });
+
+        document.getElementById('cancel-forms-btn').addEventListener('click', () => showView('landing-view'));
+        document.getElementById('nav-logo').addEventListener('click', () => showView('landing-view'));
+
+        document.getElementById('reconciliation-master-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const sPhone = document.getElementById('f1-phone').value.trim();
+            const rPhone = document.getElementById('f2-phone').value.trim();
+            const recordId = document.getElementById('edit-record-id').value;
+
+            try {
+                const checkBlock = await getDoc(doc(db, "blocks", sPhone));
+                if (checkBlock.exists()) {
+                    alert("Pipeline Suspension Error: This profile number is currently flagged on active restriction rosters.");
+                    return;
+                }
+            } catch(err) { console.error(err); }
+
+            const payload = {
+                category: activeSelectedCategory,
+                status: "Awaiting Admin Review",
+                timestamp: new Date().toISOString(),
+                senderName: document.getElementById('f1-name').value,
+                senderId: document.getElementById('f1-id').value,
+                senderPhone: sPhone,
+                senderCoords: document.getElementById('f1-coords').value,
+                conflictReason: document.getElementById('f1-reason').value,
+                senderApology: document.getElementById('f1-apology').value,
+                senderCitations: document.getElementById('f1-citations').value,
+                recipientName: document.getElementById('f2-name').value,
+                recipientPhone: rPhone,
+                recipientCoords: "",
+                galleryImages: loadedBase64GalleryStrings
+            };
+
+            try {
+                if (recordId) {
+                    await updateDoc(doc(db, "reconciliations", recordId), payload);
+                    alert("Reconciliation profile metadata updated successfully inside global records.");
+                } else {
+                    await addDoc(collection(db, "reconciliations"), payload);
+                    alert("Dossier logs recorded. Entry queued for administrative approval verification.");
+                }
+                document.getElementById('reconciliation-master-form').reset();
+                document.getElementById('f1-gallery-preview').innerHTML = "";
+                showView('landing-view');
+            } catch (err) { alert("Pipeline Transaction Failure: " + err.message); }
+        });
+
+        window.showDeclineModal = function(id) {
+            document.getElementById('modal-decline-record-id').value = id;
+            document.getElementById('decline-reason-modal').classList.remove('hidden');
+        };
+
+        document.getElementById('btn-close-decline-modal').addEventListener('click', () => {
+            document.getElementById('decline-reason-modal').classList.add('hidden');
+        });
+
+        document.querySelectorAll('.reason-option-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = document.getElementById('modal-decline-record-id').value;
+                const pickedReason = btn.getAttribute('data-reason');
+                try {
+                    await updateDoc(doc(db, "reconciliations", id), {
+                        status: "Declined",
+                        declineReason: pickedReason
+                    });
+                    document.getElementById('decline-reason-modal').classList.add('hidden');
+                    alert("Record updated to Declined with selected validation note.");
+                } catch(err) {
+                    alert("Error registering decline action matrix: " + err.message);
+                }
+            });
+        });
+
+        window.showView = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(viewId).classList.remove('hidden');
+            if (viewId === 'forms-view') { executeLeafletFormMapInit(); }
+            if (viewId === 'admin-view') { executeAdminDashboardMapInit(); if(globalReconciliationsCache.length > 0) { renderAnalyticsDashboardWidgets(globalReconciliationsCache); refreshSpatialAdminIntelligenceLayer(globalReconciliationsCache); } }
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const routeToken = urlParams.get('token');
+            if (routeToken) {
+                currentRecordTokenId = routeToken;
+                showView('recipient-view');
+                
+                try {
+                    const docSnap = await getDoc(doc(db, "reconciliations", currentRecordTokenId));
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        globalActiveRecipientData = data;
+
+                        const blockCheck = await getDoc(doc(db, "blocks", data.senderPhone));
+                        if(blockCheck.exists()) {
+                            document.getElementById('recipient-core-panel').classList.add('hidden');
+                            document.getElementById('recipient-ban-shield').classList.remove('hidden');
+                            return;
+                        }
+
+                        if (data.status === "Awaiting Admin Review") {
+                            document.getElementById('recipient-core-panel').classList.add('hidden');
+                            document.getElementById('recipient-ban-shield').classList.remove('hidden');
+                            document.getElementById('recipient-shield-error').innerText = "This reconciliation track record has not been approved by administrative systems yet.";
+                            return;
+                        } else if (data.status === "Declined") {
+                            document.getElementById('recipient-core-panel').classList.add('hidden');
+                            document.getElementById('recipient-ban-shield').classList.remove('hidden');
+                            document.getElementById('recipient-shield-error').innerHTML = `This axis submission link has been <b>Declined</b> by administration. Reason: <span class="text-rose-600 font-bold">"${data.declineReason || 'No explicit metric metadata logged.'}"</span>`;
+                            return;
+                        }
+
+                        document.getElementById('rec-view-sender-name').innerText = data.senderName;
+                        document.getElementById('rec-view-category-name').innerText = data.category;
+                        document.getElementById('rec-view-reason').innerText = data.conflictReason;
+                        document.getElementById('rec-view-apology').innerText = data.senderApology;
+                        document.getElementById('rec-view-citations').innerText = data.senderCitations || "No historic constraints logged.";
+                        
+                        const previewContainer = document.getElementById('rec-gallery-view');
+                        if(data.galleryImages && data.galleryImages.length > 0) {
+                            previewContainer.innerHTML = "";
+                            data.galleryImages.forEach(baseData => {
+                                const imgNode = document.createElement('img');
+                                imgNode.src = baseData;
+                                imgNode.className = "gallery-preview-img shadow-md border border-slate-200 image-motion-effect";
+                                previewContainer.appendChild(imgNode);
+                            });
+                        }
+
+                        const scriptSnap = await getDoc(doc(db, "scriptures", data.category));
+                        if (scriptSnap.exists()) {
+                            document.getElementById('rec-forgive-scripture').innerText = scriptSnap.data().recForgive || "Awaiting structural validation metrics updates.";
+                            document.getElementById('rec-healing-scripture').innerText = scriptSnap.data().recHealing || "Resolution pathways pending deployment loops.";
+                        }
+                    }
+                } catch(e) { console.error("Tracking reference degradation runtime alert: ", e); }
+            }
+        });
+
+        let currentRecipientCoordinatesString = "";
+        document.getElementById('recipient-location-btn').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((pos) => {
+                    currentRecipientCoordinatesString = `Lat: ${pos.coords.latitude.toFixed(6)}, Lng: ${pos.coords.longitude.toFixed(6)}`;
+                    document.getElementById('rec-loc-status').innerText = "Spatial Footprint Authenticated: " + currentRecipientCoordinatesString;
+                }, () => {
+                    currentRecipientCoordinatesString = "Lat: -1.292100, Lng: 36.821900";
+                    document.getElementById('rec-loc-status').innerText = "Default Coordinate Architecture Assigned.";
+                });
+            }
+        });
+
+        // RECIPIENT DECISION DRIVER WITH INSTANT WHATSAPP DISPATCH CORES
+        async function closeRecipientWorkflowRoute(isAcceptedResponse) {
+            if(!currentRecipientCoordinatesString) return alert("Provide spatial authentication footprint parameter maps before submission.");
+            if(!globalActiveRecipientData) return alert("Dossier cache allocation trace failure.");
+            
+            const resolutionStatus = isAcceptedResponse ? "Successful Union Logged" : "Declined";
+            const updatedPayload = {
+                status: resolutionStatus,
+                recipientCoords: currentRecipientCoordinatesString
+            };
+            
+            if(!isAcceptedResponse) {
+                updatedPayload.declineReason = "Declined from Portal Axis Gateway";
+            }
+
+            try {
+                await updateDoc(doc(db, "reconciliations", currentRecordTokenId), updatedPayload);
+                alert("Workflow response registered successfully inside the database engine.");
+                
+                // Formulate target explicit custom text strings for external WhatsApp channel loops
+                let computedWaTextMessage = "";
+                if(isAcceptedResponse) {
+                    computedWaTextMessage = `HeartBridge Update: Match Accepted! Hello ${globalActiveRecipientData.senderName}, your recipient ${globalActiveRecipientData.recipientName} has parsed and formally accepted your reconciliation proposal submission! This connection loop is now closed successfully.`;
+                } else {
+                    computedWaTextMessage = `HeartBridge Update: Hello ${globalActiveRecipientData.senderName}, your structural reconciliation request profile set up for recipient ${globalActiveRecipientData.recipientName} has been declined.`;
+                }
+                
+                const cleanSenderNumber = globalActiveRecipientData.senderPhone.replace(/\+/g, '');
+                const finalRedirectionAddress = `https://wa.me/${cleanSenderNumber}?text=${encodeURIComponent(computedWaTextMessage)}`;
+                
+                window.open(finalRedirectionAddress, '_blank');
+                window.location.href = window.location.pathname;
+            } catch(e) { alert("Data Engine Error: " + e.message); }
+        }
+
+        document.getElementById('accept-reconciliation-btn').addEventListener('click', () => closeRecipientWorkflowRoute(true));
+        document.getElementById('deconciliation-decline-btn').addEventListener('click', () => closeRecipientWorkflowRoute(false));
+
+        document.getElementById('nav-admin-btn').addEventListener('click', () => {
+            if (auth.currentUser) { showView('admin-view'); } else { showView('auth-view'); }
+        });
+
+        document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            signInWithEmailAndPassword(auth, document.getElementById('auth-email').value, document.getElementById('auth-password').value)
+                .then(() => { showView('admin-view'); })
+                .catch(err => alert("Authorization Rejected: " + err.message));
+        });
+
+        document.getElementById('admin-logout-btn').addEventListener('click', () => {
+            signOut(auth).then(() => { showView('landing-view'); });
+        });
+
+        function executeAdminDashboardMapInit() {
+            if (adminDashboardMapInstance !== null) { setTimeout(() => { adminDashboardMapInstance.invalidateSize(); }, 200); return; }
+            adminDashboardMapInstance = L.map('admin-map').setView([-1.286389, 36.817223], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(adminDashboardMapInstance);
+            adminDashboardLayerGroup = L.layerGroup().addTo(adminDashboardMapInstance);
+        }
+
+        // COMPREHENSIVE RE-ENGINEERED PARSING UTILITY FOR SPATIAL STRINGS
+        function parseCoordinatesString(coordinateString) {
+            if (!coordinateString || typeof coordinateString !== 'string') return null;
+            try {
+                const parts = coordinateString.split(',');
+                if (parts.length !== 2) return null;
+                
+                const latPart = parts[0].replace(/Lat:\s*/i, '').trim();
+                const lngPart = parts[1].replace(/Lng:\s*/i, '').trim();
+                
+                const latNum = parseFloat(latPart);
+                const lngNum = parseFloat(lngPart);
+                
+                if (isNaN(latNum) || isNaN(lngNum)) return null;
+                return [latNum, lngNum];
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function refreshSpatialAdminIntelligenceLayer(recordsArray) {
+            if (!adminDashboardLayerGroup) return;
+            adminDashboardLayerGroup.clearLayers();
+            
+            const senderIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+            const recipientIcon = L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+
+            recordsArray.forEach(record => {
+                const senderLoc = parseCoordinatesString(record.senderCoords);
+                if (senderLoc) { 
+                    L.marker(senderLoc, {icon: senderIcon}).bindPopup(`<b>Sender:</b> ${record.senderName}<br>Category: ${record.category}<br>Role: Initiator (Blue)`).addTo(adminDashboardLayerGroup); 
+                }
+                const recLoc = parseCoordinatesString(record.recipientCoords);
+                if (recLoc) { 
+                    L.marker(recLoc, {icon: recipientIcon}).bindPopup(`<b>Recipient:</b> ${record.recipientName}<br>Status: ${record.status}<br>Role: Target (Red)`).addTo(adminDashboardLayerGroup); 
+                }
+            });
+        }
+
+        // ANALYTICAL COMPUTATION MATRIX AND CHART ENGINE MANAGEMENT LOOP
+        function renderAnalyticsDashboardWidgets(records) {
+            let successCounter = 0;
+            let unsuccessfulCounter = 0;
+            let pendingCounter = 0;
+            
+            const dynamicCategoryChartMap = {
+                "Family Re-union": 0,
+                "Divorcees": 0,
+                "Broken Relationships": 0,
+                "Social Relationships over 18": 0,
+                "Organization": 0
+            };
+
+            records.forEach(rec => {
+                if (rec.status === "Successful Union Logged") {
+                    successCounter++;
+                    if (dynamicCategoryChartMap[rec.category] !== undefined) {
+                        dynamicCategoryChartMap[rec.category]++;
+                    }
+                } else if (rec.status === "Declined") {
+                    unsuccessfulCounter++;
+                } else {
+                    pendingCounter++;
+                }
+            });
+
+            document.getElementById('stat-successful').innerText = successCounter;
+            document.getElementById('stat-unsuccessful').innerText = unsuccessfulCounter;
+            document.getElementById('stat-pending').innerText = pendingCounter;
+
+            // Chart JS Implementation Context initialization parameters
+            const canvasCtx = document.getElementById('successPieChart').getContext('2d');
+            
+            if (successPieChartInstance) {
+                successPieChartInstance.destroy();
+            }
+
+            const chartDataArray = [
+                dynamicCategoryChartMap["Family Re-union"],
+                dynamicCategoryChartMap["Divorcees"],
+                dynamicCategoryChartMap["Broken Relationships"],
+                dynamicCategoryChartMap["Social Relationships over 18"],
+                dynamicCategoryChartMap["Organization"]
+            ];
+
+            successPieChartInstance = new Chart(canvasCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Family', 'Divorcees', 'Broken Engagement', 'Social (18+)', 'Organization'],
+                    datasets: [{
+                        data: chartDataArray,
+                        backgroundColor: ['#3b82f6', '#a855f7', '#f59e0b', '#f43f5e', '#10b981'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('btn-execute-csv-export').addEventListener('click', () => {
+            const categoryFilter = document.getElementById('export-category-filter').value;
+            const dateFilter = document.getElementById('export-date-filter').value;
+
+            if(!dateFilter) return alert("Select an explicit calibration tracking date for export validation.");
+
+            const filteredDataset = globalReconciliationsCache.filter(item => {
+                if (item.category !== categoryFilter) return false;
+                if (!item.timestamp) return false;
+                const normalizedItemDate = item.timestamp.split('T')[0];
+                return normalizedItemDate === dateFilter;
+            });
+
+            if(filteredDataset.length === 0) {
+                return alert("No reconciliation matrices found for specified category on chosen target date.");
+            }
+
+            let csvHeaders = ["Record ID", "Timestamp", "Category", "Status", "Sender Name", "Sender Phone", "Sender Coordinates", "Recipient Name", "Recipient Phone", "Recipient Coordinates", "Conflict Reason"];
+            let csvRows = [csvHeaders.join(",")];
+
+            filteredDataset.forEach(row => {
+                let sanitizedReason = (row.conflictReason || "").replace(/"/g, '""');
+                let rowValues = [
+                    `"${row.id}"`,
+                    `"${row.timestamp}"`,
+                    `"${row.category}"`,
+                    `"${row.status}"`,
+                    `"${row.senderName || ''}"`,
+                    `"${row.senderPhone || ''}"`,
+                    `"${row.senderCoords || ''}"`,
+                    `"${row.recipientName || ''}"`,
+                    `"${row.recipientPhone || ''}"`,
+                    `"${row.recipientCoords || ''}"`,
+                    `"${sanitizedReason}"`
+                ];
+                csvRows.push(rowValues.join(","));
+            });
+
+            const csvBlob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            const temporaryDownloadLink = document.createElement("a");
+            const compiledFileName = `HeartBridge_Export_${categoryFilter.replace(/\s+/g, '_')}_${dateFilter}.csv`;
+            
+            temporaryDownloadLink.href = URL.createObjectURL(csvBlob);
+            temporaryDownloadLink.setAttribute("download", compiledFileName);
+            temporaryDownloadLink.style.visibility = 'hidden';
+            document.body.appendChild(temporaryDownloadLink);
+            temporaryDownloadLink.click();
+            document.body.removeChild(temporaryDownloadLink);
+        });
+
+        document.getElementById('btn-edit-scripture-prep').addEventListener('click', async () => {
+            const targetCat = document.getElementById('cms-prep-category').value;
+            try {
+                const docSnap = await getDoc(doc(db, "scriptures", targetCat));
+                if(docSnap.exists()) {
+                    document.getElementById('cms-prep-conviction').value = docSnap.data().prepConviction || "";
+                    document.getElementById('cms-prep-quote').value = docSnap.data().prepQuote || "";
+                    alert(`Loaded current Prep criteria for [ ${targetCat} ] into active editing nodes.`);
+                } else {
+                    alert("No existing record context matches discovered for this category yet.");
+                }
+            } catch(ex) { alert("Error pulling criteria layers: " + ex.message); }
+        });
+
+        document.getElementById('btn-edit-scripture-rec').addEventListener('click', async () => {
+            const targetCat = document.getElementById('cms-rec-category').value;
+            try {
+                const docSnap = await getDoc(doc(db, "scriptures", targetCat));
+                if(docSnap.exists()) {
+                    document.getElementById('cms-rec-forgive').value = docSnap.data().recForgive || "";
+                    document.getElementById('cms-rec-healing').value = docSnap.data().recHealing || "";
+                    alert(`Loaded current Resolution criteria for [ ${targetCat} ] into active editing nodes.`);
+                } else {
+                    alert("No existing record context matches discovered for this category yet.");
+                }
+            } catch(ex) { alert("Error pulling criteria layers: " + ex.message); }
+        });
+
+        document.getElementById('btn-delete-scripture-prep').addEventListener('click', async () => {
+            const targetCat = document.getElementById('cms-prep-category').value;
+            if(confirm(`Purge all Prep Fields (Conviction and Quote) for category [ ${targetCat} ]?`)) {
+                try {
+                    await setDoc(doc(db, "scriptures", targetCat), {
+                        prepConviction: "",
+                        prepQuote: ""
+                    }, { merge: true });
+                    document.getElementById('cms-prep-conviction').value = "";
+                    document.getElementById('cms-prep-quote').value = "";
+                    alert("Category prep assets successfully cleared from database registry nodes.");
+                } catch(ex) { alert("Purge Failed: " + ex.message); }
+            }
+        });
+
+        document.getElementById('btn-delete-scripture-rec').addEventListener('click', async () => {
+            const targetCat = document.getElementById('cms-rec-category').value;
+            if(confirm(`Purge all Resolution Fields (Forgiveness and Healing) for category [ ${targetCat} ]?`)) {
+                try {
+                    await setDoc(doc(db, "scriptures", targetCat), {
+                        recForgive: "",
+                        recHealing: ""
+                    }, { merge: true });
+                    document.getElementById('cms-rec-forgive').value = "";
+                    document.getElementById('cms-rec-healing').value = "";
+                    alert("Category resolution parameters dropped from ledger pipeline entries.");
+                } catch(ex) { alert("Purge Failed: " + ex.message); }
+            }
+        });
+
+        function startAdminDashboardRealtimeSync() {
+            if (adminLiveStreamUnsubscribe) adminLiveStreamUnsubscribe();
+            const tableBody = document.getElementById('admin-table-body');
+            
+            adminLiveStreamUnsubscribe = onSnapshot(collection(db, "reconciliations"), (snapshot) => {
+                globalReconciliationsCache = [];
+                tableBody.innerHTML = "";
+
+                snapshot.forEach((docNode) => {
+                    const data = docNode.data();
+                    const id = docNode.id;
+                    globalReconciliationsCache.push({id, ...data});
+
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-slate-50 border-b border-slate-100 text-[11px]";
+                    
+                    let badgeColor = "bg-amber-100 text-amber-800";
+                    if(data.status === "Approved") badgeColor = "bg-purple-100 text-purple-800";
+                    if(data.status === "Declined") badgeColor = "bg-rose-100 text-rose-800";
+                    if(data.status === "Successful Union Logged") badgeColor = "bg-blue-100 text-blue-800";
+
+                    let statusBadgeMarkup = `<span class="${badgeColor} font-bold px-2.5 py-1 rounded-md block text-center">${data.status}</span>`;
+                    if(data.status === "Declined" && data.declineReason) {
+                        statusBadgeMarkup += `<p class="text-[10px] text-rose-600 italic font-semibold mt-1 max-w-[140px] break-words text-center">Reason: ${data.declineReason}</p>`;
+                    }
+                    
+                    let recipientButtonMarkup = "";
+                    if(data.status === "Approved") {
+                        recipientButtonMarkup = `
+                            <button data-id="${id}" class="btn-admin-wa-recipient bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded shadow-sm" title="WhatsApp Recipient">
+                                <i class="fa-brands fa-whatsapp text-xs"></i> Recipient Link
+                            </button>
+                        `;
+                    } else {
+                        recipientButtonMarkup = `
+                            <button disabled class="bg-slate-200 text-slate-400 px-2 py-1 rounded cursor-not-allowed text-xs" title="Link hidden until Approved">
+                                <i class="fa-solid fa-link-slash"></i> Recipient Locked
+                            </button>
+                        `;
+                    }
+
+                    let operationalControls = `
+                        <div class="flex items-center justify-center gap-1 flex-wrap">
+                            <button data-id="${id}" class="btn-admin-approve bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-1 rounded font-bold" title="Approve Link Transmission">
+                                <i class="fa-solid fa-circle-check"></i> Approve
+                            </button>
+                            <button data-id="${id}" class="btn-admin-decline bg-rose-500 hover:bg-rose-600 text-white px-2 py-1 rounded font-bold" title="Decline & Assign Reason">
+                                <i class="fa-solid fa-circle-xmark"></i> Decline
+                            </button>
+                            <div class="w-full my-0.5 border-t border-slate-100"></div>
+                            <button data-id="${id}" class="btn-admin-wa-sender bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded shadow-sm" title="WhatsApp Sender">
+                                <i class="fa-brands fa-whatsapp text-xs"></i> Sender
+                            </button>
+                            ${recipientButtonMarkup}
+                            <button data-id="${id}" class="btn-admin-edit bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded" title="Edit Entry">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button data-id="${id}" class="btn-admin-delete bg-rose-600 hover:bg-rose-700 text-white px-2 py-1 rounded" title="Delete Log">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                            <button data-phone="${data.senderPhone}" class="btn-toggle-block bg-slate-900 hover:bg-rose-600 text-white px-2 py-1 rounded transition" title="Toggle Access Block">
+                                <i class="fa-solid fa-user-defense"></i> Lock/Unlock Axis
+                            </button>
+                        </div>
+                    `;
+
+                    row.innerHTML = `
+                        <td class="p-4 font-bold text-slate-900">${data.senderName}<br><span class="text-slate-400 font-mono">${data.senderPhone}</span></td>
+                        <td class="p-4 font-bold text-slate-900">${data.recipientName}<br><span class="text-slate-400 font-mono">${data.recipientPhone}</span></td>
+                        <td class="p-4 text-slate-500">${data.category}</td>
+                        <td class="p-4">${statusBadgeMarkup}</td>
+                        <td class="p-4 text-center">${operationalControls}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                document.querySelectorAll('.btn-admin-approve').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const id = btn.getAttribute('data-id');
+                        try {
+                            await updateDoc(doc(db, "reconciliations", id), {
+                                status: "Approved"
+                            });
+                            alert("Dossier profile status has been marked as Approved. Recipient tracking link generation active.");
+                        } catch(err) { alert(err.message); }
+                    });
+                });
+
+                document.querySelectorAll('.btn-admin-decline').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        showDeclineModal(btn.getAttribute('data-id'));
+                    });
+                });
+
+                document.querySelectorAll('.btn-admin-wa-sender').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const rec = globalReconciliationsCache.find(r => r.id === btn.getAttribute('data-id'));
+                        let statusTextMessage = `Status: [ ${rec.status} ].`;
+                        if(rec.status === "Declined") {
+                            statusTextMessage = `Status: [ Declined ]. Reason: "${rec.declineReason || 'Criteria Variant mismatch.'}"`;
+                        }
+                        const txt = encodeURIComponent(`HeartBridge Administrative Update Framework: Hello ${rec.senderName}, we have processed your reconciliation tracking dossier channel initialized for target recipient: ${rec.recipientName}. ${statusTextMessage}`);
+                        window.open(`https://wa.me/${rec.senderPhone.replace(/\+/g, '')}?text=${txt}`, '_blank');
+                    });
+                });
+
+                document.querySelectorAll('.btn-admin-wa-recipient').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const rec = globalReconciliationsCache.find(r => r.id === btn.getAttribute('data-id'));
+                        const targetPortalLink = `${window.location.origin}${window.location.pathname}?token=${rec.id}`;
+                        const txt = encodeURIComponent(`HeartBridge Secure Invitation: Hello ${rec.recipientName}, you have an active alignment engagement proposal request ledger from ${rec.senderName} awaiting your parsing confirmation evaluation. Open your unique gateway here: ${targetPortalLink}`);
+                        window.open(`https://wa.me/${rec.recipientPhone.replace(/\+/g, '')}?text=${txt}`, '_blank');
+                    });
+                });
+
+                document.querySelectorAll('.btn-admin-edit').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const rec = globalReconciliationsCache.find(r => r.id === btn.getAttribute('data-id'));
+                        activeSelectedCategory = rec.category;
+                        document.getElementById('edit-record-id').value = rec.id;
+                        document.getElementById('f1-name').value = rec.senderName;
+                        document.getElementById('f1-id').value = rec.senderId;
+                        document.getElementById('f1-phone').value = rec.senderPhone;
+                        document.getElementById('f1-coords').value = rec.senderCoords;
+                        document.getElementById('f1-reason').value = rec.conflictReason;
+                        document.getElementById('f1-apology').value = rec.senderApology;
+                        document.getElementById('f1-citations').value = rec.senderCitations || "";
+                        document.getElementById('f2-name').value = rec.recipientName;
+                        document.getElementById('f2-phone').value = rec.recipientPhone;
+                        document.getElementById('form-category-sub').innerText = "Editing Record Framework Pin: " + rec.id;
+                        showView('forms-view');
+                    });
+                });
+
+                document.querySelectorAll('.btn-admin-delete').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if(confirm("Are you absolute on removing this reconciliation tracker context entry from history?")) {
+                            try {
+                                await deleteDoc(doc(db, "reconciliations", btn.getAttribute('data-id')));
+                                alert("Record deleted successfully.");
+                            } catch(err) { alert(err.message); }
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.btn-toggle-block').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const phoneNum = btn.getAttribute('data-phone');
+                        try {
+                            const blockRef = doc(db, "blocks", phoneNum);
+                            const blockSnap = await getDoc(blockRef);
+                            if(blockSnap.exists()) {
+                                await deleteDoc(blockRef);
+                                alert(`Axis Restored: Phone profile data route [ ${phoneNum} ] open.`);
+                            } else {
+                                await setDoc(blockRef, { blockedAt: new Date().toISOString(), alertTag: "Manual Abuse Record Containment Flag" });
+                                alert(`Axis Restricted: Communication block configuration activated for [ ${phoneNum} ].`);
+                            }
+                        } catch(err) { alert("Fault configuration loop: " + err.message); }
+                    });
+                });
+
+                // Update analytical indicators and maps dynamically inside runtime streams
+                renderAnalyticsDashboardWidgets(globalReconciliationsCache);
+                if(!document.getElementById('admin-view').classList.contains('hidden')) {
+                    refreshSpatialAdminIntelligenceLayer(globalReconciliationsCache);
+                }
+            });
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('admin-logout-btn').classList.remove('hidden');
+                startAdminDashboardRealtimeSync();
+            } else {
+                document.getElementById('admin-logout-btn').classList.add('hidden');
+            }
+        });
+
+        document.getElementById('admin-cms-prep-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedCat = document.getElementById('cms-prep-category').value;
+            try {
+                await setDoc(doc(db, "scriptures", selectedCat), {
+                    prepConviction: document.getElementById('cms-prep-conviction').value,
+                    prepQuote: document.getElementById('cms-prep-quote').value
+                }, { merge: true });
+                alert("Prep asset layers stored safely inside cluster.");
+                document.getElementById('admin-cms-prep-form').reset();
+            } catch(ex) { alert(ex.message); }
+        });
+
+        document.getElementById('admin-cms-rec-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const selectedCat = document.getElementById('cms-rec-category').value;
+            try {
+                await setDoc(doc(db, "scriptures", selectedCat), {
+                    recForgive: document.getElementById('cms-rec-forgive').value,
+                    recHealing: document.getElementById('cms-rec-healing').value
+                }, { merge: true });
+                alert("Resolution engine criteria updated inside cluster nodes.");
+                document.getElementById('admin-cms-rec-form').reset();
+            } catch(ex) { alert(ex.message); }
+        });
+    </script>
+</body>
+</html>
