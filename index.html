@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Kingdom Love Pipeline — From Revelation to Multiplication</title>
+  <title>The Kingdom Love Pipeline & Pythagorean Architecture — From Revelation to Multiplication</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,6 +24,14 @@
               400: '#fbbf24',
               500: '#f59e0b',
               600: '#d97706',
+            },
+            kingdom: {
+              gold: '#D4AF37',
+              darkGold: '#9A7010',
+              royal: '#0B0F19',
+              slate: '#111827',
+              cardBg: '#1F2937',
+              accent: '#3B82F6'
             }
           }
         }
@@ -41,13 +49,16 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
     .gradient-bg {
       background: linear-gradient(135deg, #4c0519 0%, #881337 50%, #1e1b4b 100%);
     }
+    .gold-gradient { background: linear-gradient(135deg, #FDE047 0%, #D4AF37 50%, #9A7010 100%); }
+    .royal-card { background: rgba(31, 41, 55, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(212, 175, 55, 0.25); }
+    .royal-card:hover { border-color: rgba(212, 175, 55, 0.5); box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.15); }
     @media print {
       .no-print { display: none !important; }
       .print-only { display: block !important; }
@@ -67,7 +78,7 @@
           </div>
           <div>
             <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-rose-100 to-gold-400 bg-clip-text text-transparent">KINGDOM LOVE</span>
-            <span class="text-xs block text-rose-300 font-medium tracking-widest uppercase">Pipeline & Audit</span>
+            <span class="text-xs block text-rose-300 font-medium tracking-widest uppercase">Pipeline & Architecture</span>
           </div>
         </div>
 
@@ -81,6 +92,9 @@
           </button>
           <button id="nav-study" onclick="switchTab('study')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300">
             <i class="fa-solid fa-book-bible mr-1.5"></i> User Love Study
+          </button>
+          <button id="nav-pythagorean" onclick="switchTab('pythagorean')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-compass-drafting mr-1.5"></i> Pythagorean Arch
           </button>
           <button id="nav-report" onclick="switchTab('report')" class="px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:bg-slate-800 text-slate-300">
             <i class="fa-solid fa-chart-line mr-1.5"></i> User Love Walk Report
@@ -106,6 +120,7 @@
     <button onclick="switchTab('landing')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-house text-base"></i><span>Home</span></button>
     <button onclick="switchTab('input')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-pen-to-square text-base"></i><span>Input</span></button>
     <button onclick="switchTab('study')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-book-bible text-base"></i><span>Study</span></button>
+    <button onclick="switchTab('pythagorean')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-compass-drafting text-base"></i><span>Pythagoras</span></button>
     <button onclick="switchTab('report')" class="flex flex-col items-center text-slate-400 hover:text-white"><i class="fa-solid fa-chart-line text-base"></i><span>Report</span></button>
   </div>
 
@@ -139,13 +154,14 @@
             <button onclick="switchTab('input')" class="bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-600 hover:to-amber-700 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl shadow-lg shadow-gold-500/20 transition-all flex items-center space-x-2">
               <span>Begin Your Love Audit</span> <i class="fa-solid fa-arrow-right"></i>
             </button>
-            <button onclick="switchTab('study')" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-6 py-3.5 rounded-xl backdrop-blur-md transition-all flex items-center space-x-2">
-              <i class="fa-solid fa-book-open"></i> <span>Explore "WHO" & "HOW" Study</span>
+            <button onclick="switchTab('pythagorean')" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold px-6 py-3.5 rounded-xl backdrop-blur-md transition-all flex items-center space-x-2">
+              <i class="fa-solid fa-compass-drafting"></i> <span>Explore Pythagorean Architecture</span>
             </button>
           </div>
         </div>
       </div>
-            <!-- Part 1 Exposition -->
+
+      <!-- Core Foundations Exposition -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
           <div class="w-12 h-12 rounded-xl bg-rose-100 text-brand-600 flex items-center justify-center text-xl font-bold">
@@ -303,7 +319,7 @@
         </div>
       </div>
 
-      <!-- AUDIT QUESTIONS CONTAINER (Populated dynamically) -->
+      <!-- AUDIT QUESTIONS CONTAINER -->
       <div id="auditQuestionsContainer" class="space-y-8"></div>
 
       <!-- Submit / Save Section -->
@@ -317,7 +333,7 @@
       </div>
     </section>
 
-    <!-- ==================== TAB 3: USER LOVE STUDY (FULLY EXPANDED WITH "WHO" & "HOW") ==================== -->
+    <!-- ==================== TAB 3: USER LOVE STUDY ==================== -->
     <section id="tab-study" class="tab-content hidden space-y-12">
       <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6">
         <div class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider">
@@ -341,57 +357,13 @@
         </div>
       </div>
 
-      <!-- SPECIAL EXPOSITION MODULE: THE "WHO" AND "HOW" TO LOVE (MATTHEW 22:36–40) -->
+      <!-- EXPOSITION MODULE: THE "WHO" AND "HOW" TO LOVE -->
       <div class="bg-white rounded-2xl border border-amber-300 shadow-md p-6 sm:p-8 space-y-8">
         <div class="border-b border-amber-200 pb-4">
           <span class="text-xs font-extrabold uppercase tracking-widest text-amber-600 block"><i class="fa-solid fa-crown"></i> Constitutional Foundation</span>
           <h3 class="text-2xl font-extrabold text-slate-900">The "WHO" to Love & The "HOW" to Love Them</h3>
           <p class="text-xs text-slate-500 mt-1">Exposition based on Matthew 22:36–40 with full scriptural illustrations.</p>
         </div>
-              <!-- Part 1 Exposition -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-          <div class="w-12 h-12 rounded-xl bg-rose-100 text-brand-600 flex items-center justify-center text-xl font-bold">
-            1
-          </div>
-          <h3 class="text-xl font-bold text-slate-900">"God is Love" as Absolute Reality</h3>
-          <p class="text-xs text-rose-600 font-bold tracking-wider uppercase">1 John 4:7–12, 16</p>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            Scripture does not say God merely possesses love; it declares <strong>"God is love"</strong> (1 John 4:8).
-          </p>
-          <ul class="space-y-3 text-sm text-slate-600">
-            <li class="flex items-start space-x-2">
-              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
-              <span><strong>The Originator:</strong> God is the self-existent source of love. Human love is reactive and conditional, but God's love is uncaused, active, and eternal (<em>Jeremiah 31:3</em>).</span>
-            </li>
-            <li class="flex items-start space-x-2">
-              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
-              <span><strong>The Trinity as Prototype:</strong> Before creation, Father, Son, and Holy Spirit existed in perfect, self-giving communion (<em>John 17:24</em>). The Kingdom is the opening up of that divine trinitarian love to creation.</span>
-            </li>
-          </ul>
-        </div>
-
-        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl font-bold">
-            2
-          </div>
-          <h3 class="text-xl font-bold text-slate-900">Love as Supreme Governing Law</h3>
-          <p class="text-xs text-amber-600 font-bold tracking-wider uppercase">Matthew 22:36–40; Romans 13:8–10</p>
-          <p class="text-sm text-slate-600 leading-relaxed">
-            When asked for the greatest commandment, Jesus summarized all revelation into two directives: supreme love for God and selfless love for neighbor.
-          </p>
-          <ul class="space-y-3 text-sm text-slate-600">
-            <li class="flex items-start space-x-2">
-              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
-              <span><strong>The Law Fulfilled:</strong> Paul reinforces in Romans 13:10: <em>"Love does no harm to a neighbor; therefore love is the fulfillment of the law."</em></span>
-            </li>
-            <li class="flex items-start space-x-2">
-              <i class="fa-solid fa-check text-emerald-500 mt-1"></i>
-              <span><strong>Constitutional Standard:</strong> In earthly kingdoms power governs. In God's Kingdom, love governs every authority, duty, and spiritual gift (<em>1 Corinthians 13:1–3</em>). Without love, all activity is noise.</span>
-            </li>
-          </ul>
-        </div>
-      </div>
 
         <!-- Part 1: THE WHO TO LOVE -->
         <div class="space-y-4">
@@ -554,7 +526,6 @@
               </div>
             </div>
 
-            <!-- Full Scripture Text Expansion -->
             <div class="space-y-2 border-t border-slate-100 pt-4">
               <span class="text-xs font-bold text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-scroll text-amber-600"></i> Key Passages for Stage 1:</span>
               <blockquote class="p-3 bg-slate-50 rounded-lg text-xs italic text-slate-700 space-y-2">
@@ -563,7 +534,6 @@
               </blockquote>
             </div>
 
-            <!-- Dynamic Action & Study Suggestion Box for Stage 1 -->
             <div id="dynamic-action-stage1" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
               <div class="dynamic-content text-xs text-slate-700">
@@ -601,7 +571,6 @@
               </blockquote>
             </div>
 
-            <!-- Dynamic Action Box for Stage 2 -->
             <div id="dynamic-action-stage2" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
               <div class="dynamic-content text-xs text-slate-700">
@@ -639,7 +608,6 @@
               </blockquote>
             </div>
 
-            <!-- Dynamic Action Box for Stage 3 -->
             <div id="dynamic-action-stage3" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
               <div class="dynamic-content text-xs text-slate-700">
@@ -677,7 +645,6 @@
               </blockquote>
             </div>
 
-            <!-- Dynamic Action Box for Stage 4 -->
             <div id="dynamic-action-stage4" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
               <div class="dynamic-content text-xs text-slate-700">
@@ -715,7 +682,6 @@
               </blockquote>
             </div>
 
-            <!-- Dynamic Action Box for Stage 5 -->
             <div id="dynamic-action-stage5" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
               <div class="dynamic-content text-xs text-slate-700">
@@ -752,7 +718,6 @@
               </blockquote>
             </div>
 
-            <!-- Dynamic Action Box for Stage 6 -->
             <div id="dynamic-action-stage6" class="p-5 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
               <span class="text-xs font-extrabold uppercase tracking-wider text-slate-500"><i class="fa-solid fa-sliders text-brand-600"></i> Score-Based Diagnostic & Action Step</span>
               <div class="dynamic-content text-xs text-slate-700">
@@ -765,7 +730,321 @@
       </div>
     </section>
 
-    <!-- ==================== TAB 4: USER LOVE WALK REPORT ==================== -->
+    <!-- ==================== TAB 4: PYTHAGOREAN ARCHITECTURE & CALCULATOR ==================== -->
+    <section id="tab-pythagorean" class="tab-content hidden space-y-16">
+      <!-- Pythagorean Hero Header -->
+      <div class="relative overflow-hidden rounded-3xl border border-kingdom-gold/30 bg-gradient-to-b from-slate-950 via-kingdom-royal to-kingdom-slate py-16 px-6 sm:px-12 text-center shadow-2xl">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#D4AF37_1px,transparent_1px)] [background-size:20px_20px]"></div>
+        <div class="max-w-4xl mx-auto relative z-10 space-y-6">
+          <span class="inline-block px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-kingdom-gold border border-kingdom-gold/40 rounded-full bg-kingdom-gold/10">
+            Advanced Divine Architecture & Spiritual Mathematics
+          </span>
+          <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight font-serif">
+            The Pythagorean Architecture of the <span class="text-transparent bg-clip-text gold-gradient">Kingdom of Heaven</span>
+          </h2>
+          <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-3xl mx-auto">
+            An exhaustive study curriculum mapping believer growth, wealth creation, power, and influence through the Pythagorean theorem (<span class="text-kingdom-gold font-mono">a² + b² = c²</span>), strict 90° Christ anchoring, calibrated scales (<span class="text-kingdom-gold font-mono">b: 1–24, a: 1–10</span>), and the Two Greatest Commandments.
+          </p>
+        </div>
+      </div>
+
+      <!-- SECTION 1: INTRODUCTION & THE 90° PRINCIPLE -->
+      <section id="pyth-intro" class="space-y-8">
+        <div class="text-center mb-8">
+          <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">1. Introduction & The Absolute Primacy of the 90° Principle</h3>
+          <div class="w-24 h-1 gold-gradient mx-auto rounded-full"></div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h4 class="text-xl font-bold text-kingdom-darkGold font-serif">Jesus Christ as the Right Angle (∠ 90°)</h4>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              In the architecture of the Kingdom, nothing is arbitrary. Jesus Christ is the immovable Right Angle (∠ 90°). Without Christ as the structural pivot (Ephesians 2:20, Isaiah 28:16), vertical devotion (God) and horizontal service (neighbor) remain disjointed vectors that can never close into a load-bearing triangle.
+            </p>
+            <ul class="space-y-2 text-slate-600 text-sm">
+              <li>• <strong>Vertical Height (b):</strong> Love for God ("Love the Lord your God", Matthew 22:37); calibrated on a strict <span class="text-kingdom-darkGold font-mono">1 to 24</span> scale.</li>
+              <li>• <strong>Horizontal Base (a):</strong> Love for neighbors ("Love your neighbor as yourself", Matthew 22:39); calibrated on a strict <span class="text-kingdom-darkGold font-mono">1 to 10</span> scale.</li>
+              <li>• <strong>The Equation:</strong> <span class="font-mono text-kingdom-darkGold">a² + b² = c²</span>, producing the total redemptive trajectory of grace.</li>
+            </ul>
+          </div>
+          <div class="bg-slate-900 text-white p-8 rounded-2xl border border-slate-800 text-center relative overflow-hidden flex flex-col justify-center items-center shadow-xl">
+            <div class="text-kingdom-gold font-mono text-xs mb-2 tracking-widest uppercase">The 90° Anchored Equation</div>
+            <div class="text-3xl sm:text-4xl font-extrabold text-white mb-4 font-mono">
+              a² + b² = c²
+            </div>
+            <p class="text-slate-400 text-sm max-w-sm leading-relaxed">
+              Human effort without the 90° Christ anchor results in structural distortion, vertical legalism (burnout), or horizontal secular humanism (exhaustion).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: SCRIPTURAL LINKING STRATEGY -->
+      <section id="pyth-linking" class="space-y-8">
+        <div class="text-center mb-8">
+          <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">2. The Scriptural Linking Strategy in Christ</h3>
+          <p class="text-slate-500 text-sm max-w-2xl mx-auto">How dimensions $3 \rightarrow 4 \rightarrow 5$, $5 \rightarrow 12 \rightarrow 13$, and advanced triples interconnect in the single body of Christ.</p>
+          <div class="w-24 h-1 gold-gradient mx-auto rounded-full mt-3"></div>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h4 class="text-lg font-bold text-slate-900">From Witness to Governance ($3 \rightarrow 4 \rightarrow 5 \implies 5 \rightarrow 12 \rightarrow 13$)</h4>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Walking in the dimension of <strong>3</strong> (Divine Witness, Matthew 18:20) meets the physical domain of <strong>4</strong> (Creation/Earthly Needs, Genesis 1:14), resulting in <strong>5</strong> (Saving Grace, Ephesians 2:8). As maturity scales, grace ($5$) submits to apostolic government ($12$, Matthew 10:2), unlocking victorious atonement ($13$, Colossians 2:15).
+            </p>
+          </div>
+          <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h4 class="text-lg font-bold text-slate-900">From Triumph to Sovereign Priesthood ($8:15:17 \implies 7:24:25$)</h4>
+            <p class="text-sm text-slate-600 leading-relaxed">
+              Combining <strong>8</strong> (Resurrection Life, 1 Peter 1:3) with <strong>15</strong> (Feast Joy, Leviticus 23) yields unshakeable security <strong>17</strong> (Romans 8:35). The master peak merges <strong>7</strong> (Sabbath Rest) and <strong>24</strong> (Unceasing Adoration, Revelation 4) to command <strong>25</strong> (Amplified Grace, 625 Capacity).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: COMPREHENSIVE CURRICULUM -->
+      <section id="pyth-curriculum" class="space-y-8">
+        <div class="text-center mb-8">
+          <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">3. Comprehensive Curriculum: The Four Kingdom Patterns</h3>
+          <p class="text-slate-500 text-sm max-w-2xl mx-auto">Detailed scriptural representation, gap analysis, hidden axioms, and domain impacts across wealth, power, honor, and glory.</p>
+          <div class="w-24 h-1 gold-gradient mx-auto rounded-full mt-3"></div>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Pattern 1: 3:4:5 -->
+          <div class="bg-white p-8 rounded-2xl border-l-4 border-kingdom-gold shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-kingdom-darkGold">Pattern 1</span>
+                <h4 class="text-xl font-bold text-slate-900">The (3 : 4 : 5) Pattern — Foundational Witness & Salvation</h4>
+                <span class="text-xs text-slate-500 italic">Scriptural Foundations: Matthew 18:20, Mark 6:7, Ephesians 2:8-9, Genesis 1:14</span>
+              </div>
+              <div class="mt-2 md:mt-0 font-mono text-slate-900 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">
+                3² + 4² = 5² ⇒ <strong>25</strong> Capacity
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-slate-600">
+              <div class="space-y-2">
+                <strong class="text-slate-900 block">Biblical & Numerical Representation:</strong>
+                <p>• <strong>Base (a = 3, Scale 1–3):</strong> Divine witness & agreement (Matthew 18:20, Deuteronomy 19:15).</p>
+                <p>• <strong>Height (b = 4, Scale 1–4):</strong> Earthly domain & creation awareness (Genesis 1:14, Revelation 7:1).</p>
+                <p>• <strong>Hypotenuse (c = 5):</strong> Saving grace (Ephesians 2:8, Pentateuch, 5 wounds of Christ).</p>
+                <p>• <strong>Gaps:</strong> b - a = 1 (Initial Balance); c - a = 2 (Two-by-Two Gap, Mark 6:7).</p>
+              </div>
+              <div class="space-y-2">
+                <strong class="text-slate-900 block">Effects on Wealth, Power, Honor & Glory:</strong>
+                <p>• <strong>Wealth:</strong> Subsistence economy; daily bread covered (Matthew 6:11), minimal surplus.</p>
+                <p>• <strong>Power:</strong> Basic personal deliverance and family-level answered prayers.</p>
+                <p>• <strong>Honor & Glory:</strong> Local recognition; reflected personal testimony (1 Peter 2:9).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pattern 2: 5:12:13 -->
+          <div class="bg-white p-8 rounded-2xl border-l-4 border-blue-500 shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-blue-600">Pattern 2</span>
+                <h4 class="text-xl font-bold text-slate-900">The (5 : 12 : 13) Pattern — Kingdom Governance & Order</h4>
+                <span class="text-xs text-slate-500 italic">Scriptural Foundations: Genesis 49:28, Matthew 10:2, Ephesians 4:11, 1 Peter 1:3</span>
+              </div>
+              <div class="mt-2 md:mt-0 font-mono text-blue-600 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">
+                5² + 12² = 13² ⇒ <strong>169</strong> Capacity (6.7x)
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-slate-600">
+              <div class="space-y-2">
+                <strong class="text-slate-900 block">Biblical & Numerical Representation:</strong>
+                <p>• <strong>Base (a = 5, Scale 4–6):</strong> Imparted grace & marketplace service (Ephesians 4:11).</p>
+                <p>• <strong>Height (b = 12, Scale 5–12):</strong> Kingdom order & governance (12 tribes, 12 apostles).</p>
+                <p>• <strong>Hypotenuse (c = 13):</strong> Victorious redemption conquering rebellion (Genesis 14:4, Colossians 2:15).</p>
+                <p>• <strong>Gaps:</strong> b - a = 7 (Governance over Service); c - a = 8 (Resurrection Life, 1 Peter 1:3).</p>
+              </div>
+              <div class="space-y-2">
+                <strong class="text-slate-900 block">Effects on Wealth, Power, Honor & Glory:</strong>
+                <p>• <strong>Wealth:</strong> Systemic business growth; corporate capital management (Deuteronomy 8:18).</p>
+                <p>• <strong>Power:</strong> Structural authority over organizational chaos and workplace strongholds.</p>
+                <p>• <strong>Honor & Glory:</strong> Civic esteem and corporate illumination (Matthew 5:14-16).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pattern 3: 7:24:25 -->
+          <div class="bg-slate-900 text-white p-8 rounded-2xl border-l-4 border-emerald-500 shadow-xl space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div>
+                <span class="inline-block px-3 py-1 mb-2 text-xs font-bold tracking-widest uppercase text-emerald-300 bg-emerald-950/80 rounded-full border border-emerald-500/30">
+                  ★ The Best Hidden Treasure Pattern
+                </span>
+                <h4 class="text-xl font-bold text-white">The (7 : 24 : 25) Pattern — Consecrated Priesthood</h4>
+                <span class="text-xs text-slate-400 italic">Scriptural Foundations: 1 Chronicles 24, Revelation 4:4-10, Luke 13:16, Ezekiel 40:1</span>
+              </div>
+              <div class="mt-2 md:mt-0 font-mono text-emerald-400 bg-slate-950 px-4 py-2 rounded-xl border border-emerald-500/40">
+                7² + 24² = 25² ⇒ <strong>625</strong> Capacity (25x)
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-slate-300">
+              <div class="space-y-2">
+                <strong class="text-white block">Biblical & Numerical Representation:</strong>
+                <p>• <strong>Base (a = 7, Scale 7–8):</strong> Sabbath rest, fair trade, & absolute integrity (Matthew 18:22).</p>
+                <p>• <strong>Height (b = 24, Scale 13–24):</strong> Unceasing priestly adoration (1 Chronicles 24, Revelation 4).</p>
+                <p>• <strong>Hypotenuse (c = 25):</strong> Amplified grace (5 × 5) & temple service (Numbers 8:24, Ezekiel 40:1).</p>
+                <p>• <strong>Gaps:</strong> b - a = 17 (Priestly Intercession); c - a = 18 (Chai / Abundant Life, Luke 13:16).</p>
+              </div>
+              <div class="space-y-2">
+                <strong class="text-white block">Effects on Wealth, Power, Honor & Glory:</strong>
+                <p>• <strong>Wealth:</strong> Generational and institutional capital command (Proverbs 13:22).</p>
+                <p>• <strong>Power:</strong> Territorial breakthrough and generational curse removal.</p>
+                <p>• <strong>Honor & Glory:</strong> Global apostolic weight and habitation presence (Isaiah 60:1-3).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pattern 4: 8:15:17 -->
+          <div class="bg-white p-8 rounded-2xl border-l-4 border-purple-500 shadow-sm space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div>
+                <span class="text-xs font-bold uppercase tracking-widest text-purple-600">Pattern 4</span>
+                <h4 class="text-xl font-bold text-slate-900">The (8 : 15 : 17) Pattern — Resurrection Triumph</h4>
+                <span class="text-xs text-slate-500 italic">Scriptural Foundations: Genesis 8:4, Leviticus 23:6, Romans 8:35-39, Galatians 5:22-23</span>
+              </div>
+              <div class="mt-2 md:mt-0 font-mono text-purple-600 bg-slate-100 px-4 py-2 rounded-xl border border-slate-200">
+                8² + 15² = 17² ⇒ <strong>289</strong> Capacity
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6 text-sm text-slate-600">
+              <div class="space-y-2">
+                <strong class="text-slate-900 block">Biblical & Numerical Representation:</strong>
+                <p>• <strong>Base (a = 8, Scale 9–10):</strong> Regenerative new-creation walk (2 Corinthians 5:17).</p>
+                <p>• <strong>Height (b = 15, Scale 13–16):</strong> Feast-level devotion (Leviticus 23, Passover & Tabernacles).</p>
+                <p>• <strong>Hypotenuse (c = 17):</strong> Unshakeable security (Romans 8:35-39, 17 unbreakable links).</p>
+                <p>• <strong>Gaps:</strong> b - a = 7 (Feestinal Joy); c - a = 9 (The 9-fold Fruit of the Spirit, Galatians 5:22-23).</p>
+              </div>
+              <div class="space-y-2">
+                <strong class="text-slate-900 block">Effects on Wealth, Power, Honor & Glory:</strong>
+                <p>• <strong>Wealth:</strong> Famine-proof prosperity (Isaac sowing in famine, Genesis 26:12).</p>
+                <p>• <strong>Power:</strong> Invincible overcoming authority; frictionless spiritual execution.</p>
+                <p>• <strong>Honor & Glory:</strong> Covenant renown and radiant Christlike maturity.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 4: INTERACTIVE PATTERN DIAGNOSTIC & CALCULATOR -->
+      <section id="pyth-calculator" class="space-y-8">
+        <div class="text-center mb-8">
+          <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">4. Interactive Pattern Diagnostic & Calculator</h3>
+          <p class="text-slate-500 max-w-2xl mx-auto text-sm">
+            Input your Vertical Devotion (<span class="text-kingdom-darkGold font-mono">b: 1 to 24</span>) and Horizontal Service (<span class="text-kingdom-darkGold font-mono">a: 1 to 10</span>) based on the strict calibrated scoring matrix below.
+          </p>
+          <div class="w-24 h-1 gold-gradient mx-auto rounded-full mt-3"></div>
+        </div>
+
+        <!-- DIAGNOSTIC SCORING MATRIX REFERENCE -->
+        <div class="bg-white p-6 rounded-2xl mb-8 max-w-3xl mx-auto border border-kingdom-gold/30 shadow-sm text-xs sm:text-sm text-slate-600 space-y-4">
+          <h4 class="text-base font-bold text-kingdom-darkGold uppercase tracking-wider text-center">Diagnostic Scoring Matrix Reference</h4>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <strong class="text-slate-900 block text-sm border-b border-slate-200 pb-1">Vertical Height (b [1–24]):</strong>
+              <p><span class="text-kingdom-darkGold font-mono">1–4:</span> Reactive prayer, crisis-only devotion.</p>
+              <p><span class="text-kingdom-darkGold font-mono">5–12:</span> Daily prayer, consistent tithing, biblical governance.</p>
+              <p><span class="text-kingdom-darkGold font-mono">13–24:</span> Unceasing 24/7 praise posture, frequent fasting, throne-room communion.</p>
+            </div>
+            <div class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <strong class="text-slate-900 block text-sm border-b border-slate-200 pb-1">Horizontal Base (a [1–10]):</strong>
+              <p><span class="text-kingdom-darkGold font-mono">1–3:</span> Helping only immediate family and close friends.</p>
+              <p><span class="text-kingdom-darkGold font-mono">4–6:</span> Marketplace problem-solving, professional integrity, extending grace.</p>
+              <p><span class="text-kingdom-darkGold font-mono">7–10:</span> Radical 70 × 7 forgiveness, zero compromise, mentoring others into self-sufficiency.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-slate-900 text-white p-8 sm:p-12 rounded-3xl shadow-2xl max-w-3xl mx-auto border border-kingdom-gold/40">
+          <div class="grid sm:grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm font-semibold text-kingdom-gold mb-2">
+                Vertical Height (b: Love for God) [1–24]
+              </label>
+              <input type="number" id="inputB" min="1" max="24" value="12" 
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono focus:outline-none focus:border-kingdom-gold">
+              <span id="errB" class="text-xs text-red-400 mt-1 hidden block">Must be an integer between 1 and 24</span>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-kingdom-gold mb-2">
+                Horizontal Base (a: Neighbor Service) [1–10]
+              </label>
+              <input type="number" id="inputA" min="1" max="10" value="5" 
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono focus:outline-none focus:border-kingdom-gold">
+              <span id="errA" class="text-xs text-red-400 mt-1 hidden block">Must be an integer between 1 and 10</span>
+            </div>
+          </div>
+
+          <button onclick="calculatePattern()" class="w-full py-4 rounded-xl font-bold text-slate-950 gold-gradient shadow-xl hover:opacity-95 transition text-base tracking-wider uppercase">
+            Calculate My Kingdom Pattern & Capacity
+          </button>
+
+          <!-- Calculation Result Box -->
+          <div id="resultBox" class="mt-8 p-6 sm:p-8 rounded-2xl bg-slate-950 border border-slate-800 hidden space-y-6">
+            <div class="grid grid-cols-4 text-center divide-x divide-slate-800">
+              <div>
+                <div class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Vector (c)</div>
+                <div id="resC" class="text-xl sm:text-2xl font-bold text-kingdom-gold font-mono mt-1">0</div>
+              </div>
+              <div>
+                <div class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Capacity (c²)</div>
+                <div id="resCapacity" class="text-xl sm:text-2xl font-bold text-white font-mono mt-1">0</div>
+              </div>
+              <div>
+                <div class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Base Gap (b-a)</div>
+                <div id="resBaseGap" class="text-xl sm:text-2xl font-bold text-blue-400 font-mono mt-1">0</div>
+              </div>
+              <div>
+                <div class="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">Red. Gap (c-a)</div>
+                <div id="resRedGap" class="text-xl sm:text-2xl font-bold text-emerald-400 font-mono mt-1">0</div>
+              </div>
+            </div>
+            <div class="border-t border-slate-800 pt-4 text-center space-y-2">
+              <div class="text-xs text-slate-400 uppercase tracking-wider">Evaluated Operating Pattern</div>
+              <div id="resPattern" class="text-xl font-bold text-white"></div>
+              <div id="resScripture" class="text-xs text-kingdom-gold italic"></div>
+              <div id="resImplications" class="text-sm text-slate-300 leading-relaxed max-w-xl mx-auto pt-2"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 5: SUB-PILLARS, AXIOMS & PRACTICES -->
+      <section id="pyth-practices" class="space-y-8">
+        <div class="text-center mb-8">
+          <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">5. Sub-Pillars, Pattern Axioms & Transition Practices</h3>
+          <div class="w-24 h-1 gold-gradient mx-auto rounded-full"></div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h4 class="text-xl font-bold text-kingdom-darkGold font-serif">Master Sub-Pillar Principles</h4>
+            <ul class="space-y-3 text-sm text-slate-600">
+              <li><strong>1. First-Hour Throne Alignment:</strong> Prioritize unceasing praise before petition.</li>
+              <li><strong>2. Marketplace Problem-Solving:</strong> Treat neighbor love as professional service.</li>
+              <li><strong>3. Covenant Tithe & First-Fruits:</strong> Secure vertical financial flow instantly (Malachi 3:10).</li>
+              <li><strong>4. Absolute Contractual Integrity:</strong> Operate in Sabbath rest (a=7).</li>
+              <li><strong>5. Radical 70 × 7 Forgiveness:</strong> Keep the 18-Gap (Chai) clear of bitterness (Matthew 18:22).</li>
+            </ul>
+          </div>
+          <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <h4 class="text-xl font-bold text-kingdom-darkGold font-serif">Pattern Axioms & Transition Modalities</h4>
+            <ul class="space-y-3 text-sm text-slate-600">
+              <li><strong>• Non-Linear Expansion:</strong> Squared growth ensures exponential Kingdom capacity.</li>
+              <li><strong>• Asymmetrical Collapse:</strong> Zero base or zero height causes complete structural failure.</li>
+              <li><strong>• Hypotenuse Form (4k+1):</strong> Divine sovereignty (+1) always invades earthly domains (4k).</li>
+              <li><strong>• Step-by-Step Transition:</strong> Calculate baseline, elevate height (b), expand base (a), and monitor the gap.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ==================== TAB 5: USER LOVE WALK REPORT ==================== -->
     <section id="tab-report" class="tab-content hidden space-y-8">
       <!-- Report Header -->
       <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -905,21 +1184,19 @@
   <!-- Footer -->
   <footer class="bg-slate-900 text-slate-400 py-8 text-center text-xs border-t border-slate-800 no-print">
     <div class="max-w-7xl mx-auto px-4 space-y-2">
-      <p class="font-bold text-slate-300">The Kingdom Love Pipeline — From Revelation to Multiplication</p>
+      <p class="font-bold text-slate-300">The Kingdom Love Pipeline & Pythagorean Architecture — From Revelation to Multiplication</p>
       <p>Continuous spiritual diagnostic tool based on 1 John 4, Matthew 22:36–40, and the New Covenant scriptures.</p>
     </div>
   </footer>
 
   <!-- ==================== APPLICATION SCRIPT ==================== -->
   <script>
-    // Global Safe Firebase & App Initialization Variables
     window.appId = 'kingdom-love-pipeline-app';
     let currentUser = null;
     let db = null;
     let auth = null;
     let radarChartInstance = null;
 
-    // DATA STRUCTURE: 25 Statements across Sections A-G
     const AUDIT_SECTIONS = [
       {
         id: 'A',
@@ -1129,10 +1406,8 @@
       }
     ];
 
-    // User Ratings Storage
     let userRatings = {};
 
-    // INITIALIZATION ON DOM LOAD
     document.addEventListener('DOMContentLoaded', () => {
       initFirebase();
       renderAuditForm();
@@ -1140,17 +1415,16 @@
       updateCalculations();
     });
 
-    // 1. FIREBASE INITIALIZATION
     function initFirebase() {
       const firebaseConfig = {
-  apiKey: "AIzaSyAZTsgbSAoxB3ocInU_lGfATxIFcG4qlzI",
-  authDomain: "love-42e25.firebaseapp.com",
-  projectId: "love-42e25",
-  storageBucket: "love-42e25.firebasestorage.app",
-  messagingSenderId: "106832090230",
-  appId: "1:106832090230:web:c5038d2e07afa8dc3d3b57",
-  measurementId: "G-DXEX8M91PJ"
-};
+        apiKey: "AIzaSyAZTsgbSAoxB3ocInU_lGfATxIFcG4qlzI",
+        authDomain: "love-42e25.firebaseapp.com",
+        projectId: "love-42e25",
+        storageBucket: "love-42e25.firebasestorage.app",
+        messagingSenderId: "106832090230",
+        appId: "1:106832090230:web:c5038d2e07afa8dc3d3b57",
+        measurementId: "G-DXEX8M91PJ"
+      };
 
       try {
         if (!firebase.apps.length) {
@@ -1180,7 +1454,6 @@
       }
     }
 
-    // AUTH MODAL HANDLERS
     function openAuthModal() {
       if (currentUser) {
         auth.signOut();
@@ -1231,7 +1504,6 @@
       }
     }
 
-    // 2. RENDER AUDIT FORM
     function renderAuditForm() {
       const container = document.getElementById('auditQuestionsContainer');
       container.innerHTML = '';
@@ -1272,12 +1544,10 @@
               </div>
             </div>
 
-            <!-- Full Scripture Text Drawer -->
             <div id="scripture-drawer-${q.id}" class="hidden p-3 rounded-lg bg-amber-50/80 border border-amber-200 text-xs italic text-amber-950 space-y-1">
               <strong>${q.scriptureRef}:</strong> "${q.scriptureText}"
             </div>
 
-            <!-- Rating Buttons 0 to 5 -->
             <div class="pt-2 flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span class="text-[11px] font-bold text-slate-400 mr-2 uppercase">Rate:</span>
               ${[0, 1, 2, 3, 4, 5].map(score => `
@@ -1315,7 +1585,6 @@
       updateCalculations();
     }
 
-    // 3. REAL-TIME SCORE COMPUTATION & DYNAMIC ACTION GENERATION
     function updateCalculations() {
       let total = 0;
       let answered = 0;
@@ -1357,21 +1626,18 @@
         diagSub.textContent = `Focus Strategy: ${pipelineStatus.focus}`;
       }
 
-      // STAGE 1 (Section A)
       updateStageActionBox('dynamic-action-stage1', secScores.A, 20, "Revelation & Understanding", [
         "Spend 30 days meditating on 1 John 4 and Romans 8 to root out legalism and experience God's paternal affection.",
         "Study the life of Jesus in John 14 to see how divine love operates without intimidation.",
         "Memorize 1 John 4:9–10 and write a daily reflection on Christ's voluntary sacrifice."
       ]);
 
-      // STAGE 2 (Section B)
       updateStageActionBox('dynamic-action-stage2', secScores.B, 15, "Reception & Reconciliation", [
         "Practice daily forgiveness: list persons who offended you and extend unconditional grace in prayer (Ephesians 4:32).",
         "Renounce fear and condemnation daily by confessing Romans 8:1 and 1 John 4:18.",
         "Receive God's peace by sitting quietly in prayer for 10 minutes before starting daily tasks."
       ]);
 
-      // STAGE 3 (Section C & F)
       const stage3Score = secScores.C + secScores.F;
       updateStageActionBox('dynamic-action-stage3', stage3Score, 35, "Expression & Stewardship", [
         "Pick one anonymous practical act of kindness weekly (e.g., meeting a financial or physical need without taking credit).",
@@ -1379,21 +1645,18 @@
         "Conduct a financial stewardship audit: ensure complete honesty in business, taxes, and cheerful giving (1 Timothy 6:18)."
       ]);
 
-      // STAGE 4 (Section D)
       updateStageActionBox('dynamic-action-stage4', secScores.D, 15, "Abiding in Christ", [
         "Establish an unshakeable 15-to-30 minute morning rhythm of Scripture reading and fellowship prior to digital devices.",
         "Journal your daily prayer life and listen for the promptings of the Holy Spirit.",
         "Walk in Galatians 5:22 fruit by pausing to pray before responding in stressful situations."
       ]);
 
-      // STAGE 5 (Section E)
       updateStageActionBox('dynamic-action-stage5', secScores.E, 20, "Continuing & Steadfastness", [
         "Apply the 'Quick Repentance Rule': when convicted of fault or conflict, seek peace and apologize within 24 hours.",
         "Pray specifically for critics or hostile individuals in your life (Matthew 5:44).",
         "Persevere in slow-moving spiritual initiatives without growing weary or abandoning love."
       ]);
 
-      // STAGE 6 (Section G)
       updateStageActionBox('dynamic-action-stage6', secScores.G, 20, "Correction & Multiplication", [
         "Identify at least one younger believer or peer to intentionally mentor and disciple in Christlike walk.",
         "Welcome scriptural correction from trusted spiritual accountability partners without defensive behavior.",
@@ -1437,7 +1700,6 @@
       `;
     }
 
-    // 4. RENDER REPORT VIEWS & RADAR CHART
     function renderReportViews(totalScore, secScores, answeredCount) {
       const status = getPipelineStatus(totalScore);
 
@@ -1547,7 +1809,6 @@
       });
     }
 
-    // 5. FIRESTORE & LOCAL STORAGE PERSISTENCE
     async function saveAuditToFirebase(redirectToReport = false) {
       const total = Object.values(userRatings).reduce((a, b) => a + b, 0);
       const auditPayload = {
@@ -1642,12 +1903,11 @@
       }
     }
 
-    // NAVIGATION TAB SWITCHER
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
       document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
-      ['landing', 'input', 'study', 'report'].forEach(t => {
+      ['landing', 'input', 'study', 'pythagorean', 'report'].forEach(t => {
         const btn = document.getElementById(`nav-${t}`);
         if (btn) {
           if (t === tabId) {
@@ -1662,6 +1922,72 @@
         updateCalculations();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Pythagorean Calculator Logic
+    function calculatePattern() {
+      const inputB = document.getElementById('inputB');
+      const inputA = document.getElementById('inputA');
+      const errB = document.getElementById('errB');
+      const errA = document.getElementById('errA');
+
+      let b = parseFloat(inputB.value);
+      let a = parseFloat(inputA.value);
+
+      let valid = true;
+
+      if (isNaN(b) || b < 1 || b > 24) {
+        errB.classList.remove('hidden');
+        valid = false;
+      } else {
+        errB.classList.add('hidden');
+      }
+
+      if (isNaN(a) || a < 1 || a > 10) {
+        errA.classList.remove('hidden');
+        valid = false;
+      } else {
+        errA.classList.add('hidden');
+      }
+
+      if (!valid) return;
+
+      const cSquared = (a * a) + (b * b);
+      const c = Math.sqrt(cSquared);
+      const baseGap = Math.round(b - a);
+      const redGap = Math.round(c - a);
+
+      document.getElementById('resC').innerText = c.toFixed(1);
+      document.getElementById('resCapacity').innerText = Math.round(cSquared);
+      document.getElementById('resBaseGap').innerText = baseGap;
+      document.getElementById('resRedGap').innerText = redGap;
+
+      let patternName = "";
+      let scripture = "";
+      let implications = "";
+
+      if (c <= 7) {
+        patternName = "Pattern 1: (3 : 4 : 5) Baseline Witness & Salvation";
+        scripture = "Scripture: Matthew 18:20, Mark 6:7, Ephesians 2:8-9";
+        implications = "Subsistence provision, basic daily grace, local testimony, and initial saving faith capacity (25 units). Base-Height Gap is balanced; to scale upward, elevate throne-room prayer and marketplace problem-solving.";
+      } else if (c <= 14) {
+        patternName = "Pattern 2: (5 : 12 : 13) Kingdom Governance & Order";
+        scripture = "Scripture: Genesis 49:28, Matthew 10:2, Ephesians 4:11, 1 Peter 1:3";
+        implications = "Systemic business multiplication (169 capacity), corporate capital management, and structural marketplace authority. Triggers the 8-Gap (Resurrection power over lack).";
+      } else if (c <= 18) {
+        patternName = "Pattern 4: (8 : 15 : 17) Resurrection Triumph & Fruitfulness";
+        scripture = "Scripture: Genesis 8:4, Leviticus 23:6, Romans 8:35-39, Galatians 5:22-23";
+        implications = "Famine-proof prosperity (289 capacity), 9-fold spiritual fruitfulness, and unshakeable resilience against global economic pressures.";
+      } else {
+        patternName = "Pattern 3: (7 : 24 : 25) Consecrated Sovereign & Priest (Hidden Treasure)";
+        scripture = "Scripture: 1 Chronicles 24, Revelation 4:4-10, Luke 13:16, Ezekiel 40:1";
+        implications = "Maximum generational wealth (625 capacity), institutional impact, 24/7 worship posture, and Chai (life) breakthrough. Apostolic domain authority fully activated.";
+      }
+
+      document.getElementById('resPattern').innerText = patternName;
+      document.getElementById('resScripture').innerText = scripture;
+      document.getElementById('resImplications').innerText = implications;
+      document.getElementById('resultBox').classList.remove('hidden');
     }
   </script>
 </body>
